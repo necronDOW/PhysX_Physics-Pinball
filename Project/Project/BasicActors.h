@@ -123,6 +123,46 @@ namespace PhysicsEngine
 		}
 	};
 
+	class Compound : public DynamicActor
+	{
+	public:
+		Compound(const PxTransform& pose = PxTransform(PxIdentity), PxReal scale = 1.f, int edgeCount = 4, PxReal thickness = .1f, PxReal density = 1.f)
+			: DynamicActor(pose)
+		{
+			PxReal angleDiff = 360.f / (float)edgeCount;
+			PxVec3 offset = PxVec3(0.f, scale, 0.f);
+			PxReal orientation = (PxPi * 2.f) / edgeCount;
+			PxVec3 dimensions = PxVec3(Magnitude(offset, angleDiff), thickness, thickness);
+
+			for (int i = 0; i < edgeCount; i++)
+			{
+				std::cout << offset.x << ", " << offset.y << std::endl;
+				CreateShape(PxBoxGeometry(dimensions), density);
+				GetShape(i)->setLocalPose(PxTransform(offset, PxQuat(orientation * i, PxVec3(0, 0, 1))));
+
+				offset = Rotate(offset, angleDiff);
+			}
+		}
+
+	private:
+		PxVec3 Rotate(PxVec3 original, PxReal deg)
+		{
+			PxReal rad = deg * (PxPi / 180.f);
+			PxReal cO = cos(rad);
+			PxReal sO = sin(rad);
+
+			return PxVec3(cO*original.x - sO*original.y, sO*original.x + cO*original.y, original.z);
+		}
+
+		PxReal Magnitude(PxVec3 start, PxReal angleChange)
+		{
+			PxVec3 pA = start;
+			PxVec3 pB = Rotate(start, angleChange);
+
+			return (pB - pA).magnitude();
+		}
+	};
+
 	//Distance joint with the springs switched on
 	class DistanceJoint : public Joint
 	{

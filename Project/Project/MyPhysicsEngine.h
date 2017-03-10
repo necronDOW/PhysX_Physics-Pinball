@@ -182,7 +182,7 @@ namespace PhysicsEngine
 	class MyScene : public Scene
 	{
 		Plane* plane;
-		Box* box, * box2;
+		Compound* compound;
 		MySimulationEventCallback* my_callback;
 		
 	public:
@@ -212,16 +212,16 @@ namespace PhysicsEngine
 			plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 			Add(plane);
 
-			box = new Box(PxTransform(PxVec3(.0f,.5f,.0f)));
-			box->Color(color_palette[0]);
+			compound = new Compound(PxTransform(PxVec3(.0f,.25f,.0f)), 2.f, 5);
+			compound->Color(color_palette[0]);
 			//set collision filter flags
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 			//use | operator to combine more actors e.g.
 			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2);
 			//don't forget to set your flags for the matching actor as well, e.g.:
 			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
-			box->Name("Box1");
-			Add(box);
+			compound->Name("Compound1");
+			Add(compound);
 
 			/*
 			//joint two boxes together
