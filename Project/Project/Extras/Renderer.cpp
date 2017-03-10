@@ -258,8 +258,8 @@ namespace VisualDebugger
 
 			// Setup lighting
 			glEnable(GL_LIGHTING);
-			PxReal ambientColor[]	= { 0.2f, 0.2f, 0.2f, 1.f };
-			PxReal diffuseColor[]	= { 0.7f, 0.7f, 0.7f, 1.f };		
+			PxReal ambientColor[]	= { .2f, .2f, .2f, 1.f };
+			PxReal diffuseColor[]	= { .7f, .7f, .7f, 1.f };		
 			PxReal position[]		= { 50.f, 50.f, 100.f, 0.f };		
 			glLightfv(GL_LIGHT0, GL_AMBIENT, ambientColor);
 			glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseColor);
