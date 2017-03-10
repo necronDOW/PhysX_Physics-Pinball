@@ -14,10 +14,10 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Header Files\Extras">
-      <UniqueIdentifier>{af8d1bb6-9547-40aa-b3cb-0f070aca512b}</UniqueIdentifier>
+      <UniqueIdentifier>{0ac7a437-1730-413e-bc45-5d9be61f6e96}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Extras">
-      <UniqueIdentifier>{164e283a-9191-4a4e-9f86-ce68e31030d5}</UniqueIdentifier>
+      <UniqueIdentifier>{4a4dc88f-e005-4c51-9735-3c1616005150}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -48,15 +48,18 @@
     <ClInclude Include="Extras\HUD.h">
       <Filter>Header Files\Extras</Filter>
     </ClInclude>
-    <ClInclude Include="Extras\Renderer.h">
+    <ClInclude Include="Extras\UserData.h">
       <Filter>Header Files\Extras</Filter>
     </ClInclude>
-    <ClInclude Include="Extras\UserData.h">
+    <ClInclude Include="Extras\Renderer.h">
       <Filter>Header Files\Extras</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PhysicsEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tutorial 3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VisualDebugger.cpp">
@@ -70,9 +73,6 @@
     </ClCompile>
     <ClCompile Include="Extras\Renderer.cpp">
       <Filter>Source Files\Extras</Filter>
-    </ClCompile>
-    <ClCompile Include="Tutorial 3.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
