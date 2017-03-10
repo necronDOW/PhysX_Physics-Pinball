@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BasicActors.h"
+#include "Actors/Actors.h"
 #include <iostream>
 #include <iomanip>
 
@@ -182,7 +182,8 @@ namespace PhysicsEngine
 	class MyScene : public Scene
 	{
 		Plane* plane;
-		Compound* compound;
+		Polygon* poly;
+		Wedge* pyramid;
 		MySimulationEventCallback* my_callback;
 		
 	public:
@@ -212,16 +213,15 @@ namespace PhysicsEngine
 			plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 			Add(plane);
 
-			compound = new Compound(PxTransform(PxVec3(.0f,.25f,.0f)), 2.f, 10, PxVec2(.2f, .05f));
-			compound->Color(color_palette[0]);
-			//set collision filter flags
-			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
-			//use | operator to combine more actors e.g.
-			// box->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2);
-			//don't forget to set your flags for the matching actor as well, e.g.:
-			// box2->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
-			compound->Name("Compound1");
-			Add(compound);
+			poly = new Polygon(PxTransform(PxVec3(.0f,5.f,.0f)), 4.f, 6, PxVec2(.2f, .05f));
+			poly->Color(color_palette[0]);
+			poly->Name("Area");
+			Add(poly);
+
+			pyramid = new Wedge(PxTransform(PxIdentity), 1.f, PxVec3(1.f, 2.f, 1.f));
+			pyramid->Color(color_palette[0]);
+			pyramid->Name("Pyramid");
+			Add(pyramid);
 
 			/*
 			//joint two boxes together

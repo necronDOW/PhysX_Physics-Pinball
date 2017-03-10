@@ -19,11 +19,11 @@
     <Filter Include="Source Files\Extras">
       <UniqueIdentifier>{4a4dc88f-e005-4c51-9735-3c1616005150}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Actors">
+      <UniqueIdentifier>{5efe21df-fe13-4566-a3ec-642641a6464d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BasicActors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -53,6 +53,18 @@
     </ClInclude>
     <ClInclude Include="Extras\Renderer.h">
       <Filter>Header Files\Extras</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\Actors.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\Complex.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\Primitive.h">
+      <Filter>Header Files\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Actors\Joints.h">
+      <Filter>Header Files\Actors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
