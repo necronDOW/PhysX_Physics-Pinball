@@ -1,4 +1,5 @@
-#pragma once
+#ifndef renderer_h
+#define renderer_h
 
 #include "PxPhysicsAPI.h"
 #include "GLFontRenderer.h"
@@ -46,3 +47,5 @@ namespace VisualDebugger
 		bool ShowShadows();
 	}
 }
+
+#endif

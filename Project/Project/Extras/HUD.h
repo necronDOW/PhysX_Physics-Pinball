@@ -1,4 +1,5 @@
-#pragma once
+#ifndef hud_h
+#define hud_h
 
 #include "Renderer.h"
 #include <string>
@@ -167,3 +168,5 @@ namespace VisualDebugger
 		}
 	};
 }
+
+#endif

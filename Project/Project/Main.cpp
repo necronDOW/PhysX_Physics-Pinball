@@ -6,7 +6,7 @@ using namespace std;
 int main()
 {
 	try 
-	{ 
+	{
 		VisualDebugger::Init("Tutorial 3", 800, 800); 
 	}
 	catch (Exception exc) 

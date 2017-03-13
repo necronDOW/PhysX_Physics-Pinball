@@ -1,0 +1,17 @@
+ Simulation
+    F9 - select next actor
+    F10 - pause
+    F12 - reset
+
+ Display
+    F5 - help on/off
+    F6 - shadows on/off
+    F7 - render mode
+
+ Camera
+    W,S,A,D,Q,Z - forward,backward,left,right,up,down
+    mouse + click - change orientation
+    F8 - reset view
+
+ Force (applied to selected actor)
+    I,K,J,L,U,M - forward,backward,left,right,up,down

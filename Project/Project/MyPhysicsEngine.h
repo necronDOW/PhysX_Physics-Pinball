@@ -67,8 +67,8 @@ namespace PhysicsEngine
 
 			for (unsigned int i = 0; i < springs.size(); i++)
 			{
-				springs[i]->Stiffness(stiffness);
-				springs[i]->Damping(damping);
+				springs[i]->stiffness(stiffness);
+				springs[i]->damping(damping);
 			}
 		}
 
@@ -183,7 +183,10 @@ namespace PhysicsEngine
 	{
 		Plane* plane;
 		Polygon* poly;
-		Wedge* pyramid;
+		Wedge* flipperL;
+		Wedge* flipperR;
+		RevoluteJoint* jointL;
+		RevoluteJoint* jointR;
 		MySimulationEventCallback* my_callback;
 		
 	public:
@@ -196,6 +199,8 @@ namespace PhysicsEngine
 		{
 			px_scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
 			px_scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
+			px_scene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LOCAL_FRAMES, 1.0f);
+			px_scene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LIMITS, 1.0f);
 		}
 
 		//Custom scene initialisation
@@ -213,22 +218,23 @@ namespace PhysicsEngine
 			plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 			Add(plane);
 
-			poly = new Polygon(PxTransform(PxVec3(.0f,5.f,.0f)), 4.f, 6, PxVec2(.2f, .05f));
-			poly->Color(color_palette[0]);
+			poly = new Polygon(PxTransform(PxVec3(.0f,7.f,.0f), EulerToQuat(0, 0, -PxPi/4.f)), 4.f, 4, PxVec2(.5f, .1f), PxVec3(1.5f, 3.f, 1.f));
 			poly->Name("Area");
 			Add(poly);
 
-			pyramid = new Wedge(PxTransform(PxIdentity), 1.f, PxVec3(1.f, 2.f, 1.f));
-			pyramid->Color(color_palette[0]);
-			pyramid->Name("Pyramid");
-			Add(pyramid);
+			flipperL = new Wedge(PxTransform(PxVec3(1), PxQuat(PxHalfPi, PxVec3(0, 0, 1.f))), 1.f, PxVec3(1.f, 2.f, .5f));
+			Add(flipperL);
 
-			/*
-			//joint two boxes together
-			//the joint is fixed to the centre of the first box, oriented by 90 degrees around the Y axis
-			//and has the second object attached 5 meters away along the Y axis from the first object.
-			RevoluteJoint joint(box, PxTransform(PxVec3(0.f,0.f,0.f),PxQuat(PxPi/2,PxVec3(0.f,1.f,0.f))), box2, PxTransform(PxVec3(0.f,5.f,0.f)));
-			*/
+			jointL = new RevoluteJoint(nullptr, PxTransform(PxVec3(-3.f,3.f,4.f), EulerToQuat(-PxPi / 4, PxHalfPi, PxHalfPi)), flipperL, PxTransform(PxVec3(0)));
+			jointL->driveVelocity(20);
+			jointL->SetLimits(-PxPi/4.f, PxPi/4.f);
+
+			flipperR = new Wedge(PxTransform(PxVec3(1), PxQuat(-PxHalfPi, PxVec3(0, 0, 1.f))), 1.f, PxVec3(1.f, 2.f, .5f));
+			Add(flipperR);
+
+			jointR = new RevoluteJoint(nullptr, PxTransform(PxVec3(3.f,3.f,4.f), EulerToQuat(-PxPi / 4, PxHalfPi, -PxHalfPi)), flipperR, PxTransform(PxVec3(0)));
+			jointR->driveVelocity(-20);
+			jointR->SetLimits(-PxPi / 4.f, PxPi / 4.f);
 		}
 
 		//Custom udpate function
@@ -236,16 +242,22 @@ namespace PhysicsEngine
 		{
 		}
 
-		/// An example use of key release handling
-		void ExampleKeyReleaseHandler()
+		void Hit()
 		{
-			cerr << "I am realeased!" << endl;
+			jointL->driveVelocity(-jointL->driveVelocity());
+			jointR->driveVelocity(-jointR->driveVelocity());
 		}
 
-		/// An example use of key presse handling
-		void ExampleKeyPressHandler()
+		PxQuat EulerToQuat(float x, float y, float z)
 		{
-			cerr << "I am pressed!" << endl;
+			float c1 = cos(y / 2);
+			float s1 = sin(y / 2);
+			float c2 = cos(x / 2);
+			float s2 = sin(x / 2);
+			float c3 = cos(z / 2);
+			float s3 = sin(z / 2);
+
+			return PxQuat(s1*s2*c3 + c1*c2*s3, s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3, c1*c2*c3 - s1*s2*s3);
 		}
 	};
 }
