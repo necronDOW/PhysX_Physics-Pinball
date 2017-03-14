@@ -3,7 +3,6 @@
 
 #include "PxPhysicsAPI.h"
 
-//add here any other structures that you want to pass from your simulation to the renderer
 class UserData
 {
 public:

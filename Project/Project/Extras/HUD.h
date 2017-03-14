@@ -9,7 +9,6 @@ namespace VisualDebugger
 {
 	using namespace std;
 
-	///A single HUD screen
 	class HUDScreen
 	{
 		vector<string> content;
@@ -24,27 +23,23 @@ namespace VisualDebugger
 		{
 		}
 
-		///Add a single line of text
 		void AddLine(string line)
 		{
 			content.push_back(line);
 		}
 
-		///Render the screen
 		void Render()
 		{
 			for (unsigned int i = 0; i < content.size(); i++)
 				Renderer::RenderText(content[i], PxVec2(0.0, 1.f-(i+1)*font_size), color, font_size);
 		}
 
-		///Clear content of the screen
 		void Clear()
 		{
 			content.clear();
 		}
 	};
 
-	///HUD class containing multiple screens
 	class HUD
 	{
 		int active_screen;
@@ -57,7 +52,6 @@ namespace VisualDebugger
 				delete screens[i];
 		}
 
-		///Add a single line to a specific screen
 		void AddLine(int screen_id, string line)
 		{
 			for (unsigned int i = 0; i < screens.size(); i++)
@@ -73,19 +67,16 @@ namespace VisualDebugger
 			screens.back()->AddLine(line);
 		}
 
-		///Set the active screen
 		void ActiveScreen(int value)
 		{
 			active_screen = value;
 		}
 
-		///Get the active screen
 		int ActiveScreen()
 		{
 			return active_screen;		
 		}
 
-		///Clear a specified screen (or all of them)
 		void Clear(int screen_id=-1)
 		{
 			if (screen_id == -1)
@@ -108,7 +99,6 @@ namespace VisualDebugger
 			}
 		}
 
-		///Change the font size for a specified screen (-1 = all)
 		void FontSize(PxReal font_size, unsigned int screen_id=-1)
 		{
 			if (screen_id == -1)
@@ -131,7 +121,6 @@ namespace VisualDebugger
 			}
 		}
 
-		///Change the color for a specified screen (-1 = all)
 		void Color(PxVec3 color, unsigned int screen_id=-1)
 		{
 			if (screen_id == -1)
@@ -154,7 +143,6 @@ namespace VisualDebugger
 			}
 		}
 
-		///Render the active screen
 		void Render()
 		{
 			for (unsigned int i = 0; i < screens.size(); i++)

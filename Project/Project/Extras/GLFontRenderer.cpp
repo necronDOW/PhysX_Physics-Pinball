@@ -21,7 +21,6 @@ bool GLFontRenderer::init()
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	// expand to rgba
 	unsigned char* pNewSource = new unsigned char[OGL_FONT_TEXTURE_WIDTH*OGL_FONT_TEXTURE_HEIGHT*4];
 	for(int i=0;i<OGL_FONT_TEXTURE_WIDTH*OGL_FONT_TEXTURE_HEIGHT;i++)
 	{

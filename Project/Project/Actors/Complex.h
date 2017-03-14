@@ -8,14 +8,12 @@ namespace PhysicsEngine
 	class ConvexMesh : public DynamicActor
 	{
 		public:
-			//constructor
 			ConvexMesh(const std::vector<PxVec3>& verts, const PxTransform& pose = PxTransform(PxIdentity), PxReal density = 1.f)
 				: DynamicActor(pose)
 			{
 				CreateShape(PxConvexMeshGeometry(CookMesh(verts)), density);
 			}
 
-			//mesh cooking (preparation)
 			static PxConvexMesh* CookMesh(const std::vector<PxVec3>& verts, PxU16 vertexLimit = 256, PxConvexFlags flag = PxConvexFlag::eCOMPUTE_CONVEX)
 			{
 				PxConvexMeshDesc mesh_desc;
@@ -39,7 +37,6 @@ namespace PhysicsEngine
 	class TriangleMesh : public StaticActor
 	{
 		public:
-			//constructor
 			TriangleMesh(const std::vector<PxVec3>& verts, const std::vector<PxU32>& trigs, const PxTransform& pose = PxTransform(PxIdentity))
 				: StaticActor(pose)
 			{
@@ -54,8 +51,7 @@ namespace PhysicsEngine
 				CreateShape(PxTriangleMeshGeometry(CookMesh(mesh_desc)));
 			}
 
-			//mesh cooking (preparation)
-			PxTriangleMesh* CookMesh(const PxTriangleMeshDesc& mesh_desc)
+			static PxTriangleMesh* CookMesh(const PxTriangleMeshDesc& mesh_desc)
 			{
 				PxDefaultMemoryOutputStream stream;
 
@@ -70,49 +66,37 @@ namespace PhysicsEngine
 
 	class Polygon : public StaticActor
 	{
+		protected:
+			int cornerSize;
+			PxVec3* cornerData;
+
 		public:
-			Polygon(const PxTransform& pose = PxTransform(PxIdentity), float radius = 1.f, int edgeCount = 4, PxVec2 thickness = PxVec2(.1f, .1f), PxVec3 scalar = PxVec3(1), PxReal density = 1.f, bool flatBottom = true)
+			Polygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
 				: StaticActor(pose)
 			{
-				PxVec3 radiusVec = PxVec3(0.f, radius, 0.f);
+				cornerSize = edgeCount;
+				cornerData = new PxVec3[cornerSize];
+
+				PxVec3 radiusVec = PxVec3(0.f, 1.f, 0.f);
 				float angleVarience = (PxPi * 2.f) / (float)edgeCount;
-				float angle = (edgeCount % 2 != 0 && flatBottom) ? angleVarience : angleVarience / 2.f;
-				PxVec3* corners = new PxVec3[edgeCount];
+				float angle = (edgeCount % 2 != 0) ? angleVarience : angleVarience / 2.f;
 
 				for (int i = 0; i < edgeCount; i++)
 				{
-					corners[i] = Rotate(radiusVec, angle).multiply(scalar);
+					cornerData[i] = Rotate(radiusVec, angle).multiply(scale);
 					angle += angleVarience;
 				}
 
 				for (int i = 0; i < edgeCount; i++)
 				{
-					PxVec3 end = (i < edgeCount - 1) ? corners[i + 1] : corners[0];
-					PxVec3 len = end - corners[i];
+					PxVec3 end = (i < edgeCount - 1) ? cornerData[i + 1] : cornerData[0];
+					PxVec3 len = end - cornerData[i];
 					float edgeLength = len.magnitude() / 2.f;
 
-					CreateShape(PxBoxGeometry(PxVec3(edgeLength, thickness.y, thickness.x)), density);
-					GetShape(i)->setLocalPose(PxTransform(corners[i] + (len / 2.f), PxQuat(atan2(len.y, len.x), PxVec3(0, 0, 1))));
+					CreateShape(PxBoxGeometry(PxVec3(edgeLength, thickness, thickness * scale.z)), 1.f);
+					GetShape(i)->setLocalPose(PxTransform(cornerData[i] + (len / 2.f), PxQuat(atan2(len.y, len.x), PxVec3(0, 0, 1))));
 				}
 			}
-
-			/// DEPRECATED : Non-scalar solution.
-			/*Polygon(const PxTransform& pose = PxTransform(PxIdentity), float radius = 1.f, int edgeCount = 4, PxVec2 thickness = PxVec2(.1f, .1f), PxReal density = 1.f, bool flatBottom = true)
-				: StaticActor(pose)
-			{
-				PxVec3 inradius = PxVec3(0.f, radius * cos(PxPi / (float)edgeCount), 0.f);
-				float angleVarience = (PxPi * 2.f) / (float)edgeCount;
-				float edgeLength = Edge(radius, angleVarience) / 2.f;
-				float angle = (edgeCount % 2 != 0 && flatBottom) ? angleVarience / 2.f : 0.f;
-
-				for (int i = 0; i < edgeCount; i++)
-				{
-					CreateShape(PxBoxGeometry(PxVec3(edgeLength, thickness.y, thickness.x)), density);
-					GetShape(i)->setLocalPose(PxTransform(Rotate(inradius, angle), PxQuat(angle, PxVec3(0, 0, 1))));
-
-					angle += angleVarience;
-				}
-			}*/
 
 		private:
 			PxVec3 Rotate(PxVec3 original, PxReal rad)
@@ -130,6 +114,44 @@ namespace PhysicsEngine
 
 				return (next - start).magnitude();
 			}
+	};
+
+	class CappedPolygon : public Polygon
+	{
+	public:
+		enum CapMode
+		{
+			None,
+			Opaque,
+			Transparent
+		};
+
+		CappedPolygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1), CapMode top = None, CapMode bottom = None)
+			: Polygon(pose, edgeCount, thickness, scale)
+		{
+			Cap(top, 1.f, edgeCount);
+			Cap(bottom, -1.f, edgeCount + 1);
+		}
+
+	private:
+		void Cap(CapMode mode, float yOffset, int shapeIndex)
+		{
+			if (mode == None)
+				return;
+
+			/*PxTriangleMeshDesc mesh_desc;
+			mesh_desc.points.count = (PxU32)v.size();
+			mesh_desc.points.stride = sizeof(PxVec3);
+			mesh_desc.points.data = &v.front();
+			mesh_desc.triangles.count = (PxU32)el.size();
+			mesh_desc.triangles.stride = 3 * sizeof(PxU32);
+			mesh_desc.triangles.data = &el.front();*/
+
+			//CreateShape(PxTriangleMeshGeometry(TriangleMesh::CookMesh(mesh_desc)));
+
+			if (mode == Transparent)
+				GetShape(shapeIndex)->setFlag(PxShapeFlag::eVISUALIZATION, false);
+		}
 	};
 
 	class Wedge : public DynamicActor

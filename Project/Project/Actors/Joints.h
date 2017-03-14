@@ -58,7 +58,6 @@ namespace PhysicsEngine
 
 			void driveVelocity(PxReal value)
 			{
-				//wake up the attached actors
 				PxRigidDynamic *actor_0, *actor_1;
 				((PxRevoluteJoint*)joint)->getActors((PxRigidActor*&)actor_0, (PxRigidActor*&)actor_1);
 				if (actor_0)
