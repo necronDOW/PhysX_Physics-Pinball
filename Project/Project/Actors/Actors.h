@@ -6,6 +6,7 @@
 #include "Joints.h"
 #include "Complex.h"
 #include "Primitive.h"
+#include "../Extras/Helper.h"
 
 namespace PhysicsEngine
 {
@@ -45,6 +46,28 @@ namespace PhysicsEngine
 			{
 				for (unsigned int i = 0; i < springs.size(); i++)
 					delete springs[i];
+			}
+	};
+
+	class Flipper
+	{
+		private:
+			RevoluteJoint* joint;
+
+		public:
+			Flipper(Scene* scene, PxVec3 pos = PxVec3(0), PxVec3 rot = PxVec3(0), float scale = 1.f, float drive = 0.f, float lowerBounds = 0.f, float upperBounds = (PxPi * 2.f))
+			{
+				Wedge* actor = new Wedge(PxTransform(PxVec3(1), PxQuat(PxHalfPi, PxVec3(0, 0, 1.f))), 1.f, PxVec3(.5f, 1.f, .25f) * scale);
+				scene->Add(actor);
+
+				joint = new RevoluteJoint(nullptr, PxTransform(pos, Mathv::EulerToQuat(rot.x, rot.y, rot.z)), actor, PxTransform(PxVec3(0)));
+				joint->driveVelocity(drive);
+				joint->SetLimits(lowerBounds, upperBounds);
+			}
+
+			void InvertDrive()
+			{
+				joint->driveVelocity(-joint->driveVelocity());
 			}
 	};
 }

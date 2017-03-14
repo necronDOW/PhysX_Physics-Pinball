@@ -1,4 +1,5 @@
-#pragma once
+#ifndef myphysicsengine_h
+#define myphysicsengine_h
 
 #include "Actors/Actors.h"
 #include <iostream>
@@ -100,76 +101,52 @@ namespace PhysicsEngine
 	{
 		Plane* plane;
 		CappedPolygon* poly;
-		Wedge* flipperL;
-		Wedge* flipperR;
-		RevoluteJoint* jointL;
-		RevoluteJoint* jointR;
+		Flipper* flipperL;
+		Flipper* flipperR;
 		MySimulationEventCallback* my_callback;
 		
-	public:
-		MyScene() : Scene() {};
+		public:
+			MyScene() : Scene() {};
 
-		void SetVisualisation()
-		{
-			px_scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
-			px_scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
-			px_scene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LOCAL_FRAMES, 1.0f);
-			px_scene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LIMITS, 1.0f);
-		}
+			void SetVisualisation()
+			{
+				px_scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
+				px_scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
+				px_scene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LOCAL_FRAMES, 1.0f);
+				px_scene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LIMITS, 1.0f);
+			}
 
-		virtual void CustomInit() 
-		{
-			SetVisualisation();			
+			virtual void CustomInit() 
+			{
+				SetVisualisation();			
 
-			GetMaterial()->setDynamicFriction(.2f);
+				GetMaterial()->setDynamicFriction(.2f);
 
-			my_callback = new MySimulationEventCallback();
-			px_scene->setSimulationEventCallback(my_callback);
+				my_callback = new MySimulationEventCallback();
+				px_scene->setSimulationEventCallback(my_callback);
 
-			plane = new Plane();
-			plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
-			Add(plane);
+				plane = new Plane();
+				plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
+				Add(plane);
 
-			poly = new CappedPolygon(PxTransform(PxVec3(.0f,7.f,.0f), EulerToQuat(0, 0, -PxPi/4.f)), 4, .05f, PxVec3(5.f, 10.f, 5.f));
-			poly->Name("Area");
-			Add(poly);
+				poly = new CappedPolygon(PxTransform(PxVec3(.0f,7.f,.0f), Mathv::EulerToQuat(0, 0, -PxPi/4.f)), 4, .05f, PxVec3(5.f, 10.f, 5.f), CappedPolygon::Opaque);
+				poly->Name("Area");
+				Add(poly);
 
-			flipperL = new Wedge(PxTransform(PxVec3(1), PxQuat(PxHalfPi, PxVec3(0, 0, 1.f))), 1.f, PxVec3(.5f, 1.f, .25f));
-			Add(flipperL);
+				flipperL = new Flipper(this, PxVec3(-1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, PxHalfPi), 1.f, 20.f, -PxPi/4.f, PxPi/4.f);
+				flipperR = new Flipper(this, PxVec3(1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, -PxHalfPi), 1.f, -20.f, -PxPi / 4.f, PxPi / 4.f);
+			}
 
-			jointL = new RevoluteJoint(nullptr, PxTransform(PxVec3(-1.5f,3.f,4.f), EulerToQuat(-PxPi / 4, PxHalfPi, PxHalfPi)), flipperL, PxTransform(PxVec3(0)));
-			jointL->driveVelocity(20);
-			jointL->SetLimits(-PxPi/4.f, PxPi/4.f);
+			virtual void CustomUpdate() 
+			{
+			}
 
-			flipperR = new Wedge(PxTransform(PxVec3(1), PxQuat(-PxHalfPi, PxVec3(0, 0, 1.f))), 1.f, PxVec3(.5f, 1.f, .25f));
-			Add(flipperR);
-
-			jointR = new RevoluteJoint(nullptr, PxTransform(PxVec3(1.5f,3.f,4.f), EulerToQuat(-PxPi / 4, PxHalfPi, -PxHalfPi)), flipperR, PxTransform(PxVec3(0)));
-			jointR->driveVelocity(-20);
-			jointR->SetLimits(-PxPi / 4.f, PxPi / 4.f);
-		}
-
-		//Custom udpate function
-		virtual void CustomUpdate() 
-		{
-		}
-
-		void Hit()
-		{
-			jointL->driveVelocity(-jointL->driveVelocity());
-			jointR->driveVelocity(-jointR->driveVelocity());
-		}
-
-		PxQuat EulerToQuat(float x, float y, float z)
-		{
-			float c1 = cos(y / 2);
-			float s1 = sin(y / 2);
-			float c2 = cos(x / 2);
-			float s2 = sin(x / 2);
-			float c3 = cos(z / 2);
-			float s3 = sin(z / 2);
-
-			return PxQuat(s1*s2*c3 + c1*c2*s3, s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3, c1*c2*c3 - s1*s2*s3);
-		}
+			void Hit()
+			{
+				flipperL->InvertDrive();
+				flipperR->InvertDrive();
+			}
 	};
 }
+
+#endif

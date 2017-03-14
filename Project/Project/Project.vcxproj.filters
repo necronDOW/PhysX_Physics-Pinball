@@ -66,6 +66,9 @@
     <ClInclude Include="Actors\Joints.h">
       <Filter>Header Files\Actors</Filter>
     </ClInclude>
+    <ClInclude Include="Extras\Helper.h">
+      <Filter>Header Files\Extras</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PhysicsEngine.cpp">
@@ -85,6 +88,9 @@
     </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Extras\Helper.cpp">
+      <Filter>Source Files\Extras</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

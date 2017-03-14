@@ -136,6 +136,7 @@
     <ClInclude Include="Extras\Camera.h" />
     <ClInclude Include="Extras\GLFontData.h" />
     <ClInclude Include="Extras\GLFontRenderer.h" />
+    <ClInclude Include="Extras\Helper.h" />
     <ClInclude Include="Extras\HUD.h" />
     <ClInclude Include="Extras\Renderer.h" />
     <ClInclude Include="Extras\UserData.h" />
@@ -146,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="Extras\Camera.cpp" />
     <ClCompile Include="Extras\GLFontRenderer.cpp" />
+    <ClCompile Include="Extras\Helper.cpp" />
     <ClCompile Include="Extras\Renderer.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="Main.cpp" />
