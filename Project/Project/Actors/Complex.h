@@ -139,15 +139,31 @@ namespace PhysicsEngine
 			if (mode == None)
 				return;
 
-			/*PxTriangleMeshDesc mesh_desc;
-			mesh_desc.points.count = (PxU32)v.size();
-			mesh_desc.points.stride = sizeof(PxVec3);
-			mesh_desc.points.data = &v.front();
-			mesh_desc.triangles.count = (PxU32)el.size();
-			mesh_desc.triangles.stride = 3 * sizeof(PxU32);
-			mesh_desc.triangles.data = &el.front();*/
+			PxU32 vCount = cornerSize * 2 + 2;
+			PxVec3* v = new PxVec3[vCount];
+			PxU32 triCount = cornerSize * 4 * 3;
+			PxU32* tri = new PxU32[triCount];
 
-			//CreateShape(PxTriangleMeshGeometry(TriangleMesh::CookMesh(mesh_desc)));
+			for (int i = 0; i < vCount; i += 2)
+			{
+				v[i] = cornerData[i] + PxVec3(0.f, yOffset, 0.f);
+				v[i + 1] = cornerData[i] + PxVec3(0.f, yOffset - 0.01f, 0.f);
+			}
+
+			for (int i = 0; i < triCount; i += 12)
+			{
+				
+			}
+
+			PxTriangleMeshDesc mesh_desc;
+			mesh_desc.points.count = vCount;
+			mesh_desc.points.stride = sizeof(PxVec3);
+			mesh_desc.points.data = &v;
+			mesh_desc.triangles.count = triCount;
+			mesh_desc.triangles.stride = 3 * sizeof(PxU32);
+			mesh_desc.triangles.data = &tri;
+
+			CreateShape(PxTriangleMeshGeometry(TriangleMesh::CookMesh(mesh_desc)));
 
 			if (mode == Transparent)
 				GetShape(shapeIndex)->setFlag(PxShapeFlag::eVISUALIZATION, false);
