@@ -129,12 +129,12 @@ namespace PhysicsEngine
 				plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 				Add(plane);
 
-				poly = new CappedPolygon(PxTransform(PxVec3(.0f,7.f,.0f), Mathv::EulerToQuat(0, 0, -PxPi/4.f)), 4, .05f, PxVec3(5.f, 10.f, 5.f), CappedPolygon::Opaque);
+				poly = new CappedPolygon(PxTransform(PxVec3(.0f,7.f,.0f), Mathv::EulerToQuat(0, 0, -PxPi/4.f)), 4, .05f, PxVec3(5.f, 10.f, 5.f), CappedPolygon::Transparent, CappedPolygon::Opaque);
 				poly->Name("Area");
 				Add(poly);
 
-				flipperL = new Flipper(this, PxVec3(-1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, PxHalfPi), 1.f, 20.f, -PxPi/4.f, PxPi/4.f);
-				flipperR = new Flipper(this, PxVec3(1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, -PxHalfPi), 1.f, -20.f, -PxPi / 4.f, PxPi / 4.f);
+				flipperL = new Flipper(this, PxVec3(-1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, PxHalfPi), .9f, 20.f, -PxPi/4.f, PxPi/4.f);
+				flipperR = new Flipper(this, PxVec3(1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, -PxHalfPi), .9f, -20.f, -PxPi / 4.f, PxPi / 4.f);
 			}
 
 			virtual void CustomUpdate() 

@@ -129,8 +129,8 @@ namespace PhysicsEngine
 		CappedPolygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1), CapMode top = None, CapMode bottom = None)
 			: Polygon(pose, edgeCount, thickness, scale)
 		{
-			Cap(top, 1.f, edgeCount);
-			Cap(bottom, -1.f, edgeCount + 1);
+			Cap(top, thickness * scale.z, edgeCount);
+			Cap(bottom, -thickness * scale.z, edgeCount + 1);
 		}
 
 	private:
@@ -141,60 +141,21 @@ namespace PhysicsEngine
 
 			PxU32 vCount = cornerSize * 2 + 2;
 			PxVec3* v = new PxVec3[vCount];
-			PxU32 triCount = cornerSize * 4 * 3;
-			PxU32* tri = new PxU32[triCount];
 			int midIndex = vCount / 2;
 
-			v[0] = PxVec3(0.f, 0.f, yOffset + .01f);
-			v[midIndex] = PxVec3(0.f, 0.f, yOffset - .01f);
-
-			std::cout << "0: " << v[0].x << "," << v[0].y << "," << v[0].z
-				<< "\t\t    " << midIndex << ": " << v[midIndex].x << "," << v[midIndex].y << "," << v[midIndex].z << std::endl;
+			v[0] = PxVec3(0.f, 0.f, yOffset + .02f);
+			v[midIndex] = PxVec3(0.f, 0.f, yOffset - .02f);
 
 			for (int i = 1; i < midIndex; i++)
 			{
 				v[i] = cornerData[i-1] + v[0];
 				v[midIndex+i] = cornerData[i-1] + v[midIndex];
-
-				std::cout << i << ": " << v[i].x << "," << v[i].y << "," << v[i].z
-					<< "    " << midIndex+i << ": " << v[midIndex+i].x << "," << v[midIndex+i].y << "," << v[midIndex+i].z << std::endl;
 			}
 
-			int triStep = triCount / cornerSize;
-			for (int i = 0; i < cornerSize; i++)
-			{
-				int triIndex = triStep * i;
-				int vIndex = i + 1;
-				int mid = midIndex + vIndex;
-				int endMod = (i == cornerSize - 1) ? cornerSize : 0;
-
-				SetTri(tri, triIndex, vIndex, 0, vIndex + 1 - endMod);
-				SetTri(tri, triIndex + 3, vIndex, vIndex + 1 - endMod, mid + 1 - endMod);
-				SetTri(tri, triIndex + 6, vIndex, mid + 1 - endMod, mid);
-				SetTri(tri, triIndex + 9, mid, mid + 1 - endMod, midIndex);
-			}
-
-			PxTriangleMeshDesc mesh_desc;
-			mesh_desc.points.count = vCount;
-			mesh_desc.points.stride = sizeof(PxVec3);
-			mesh_desc.points.data = &v;
-			mesh_desc.triangles.count = triCount;
-			mesh_desc.triangles.stride = 3 * sizeof(PxU32);
-			mesh_desc.triangles.data = &tri;
-
-			CreateShape(PxTriangleMeshGeometry(TriangleMesh::CookMesh(mesh_desc)));
+			CreateShape(PxConvexMeshGeometry(ConvexMesh::CookMesh(vector<PxVec3>(&v[0], &v[vCount-1]))), 1.f);
 
 			if (mode == Transparent)
 				GetShape(shapeIndex)->setFlag(PxShapeFlag::eVISUALIZATION, false);
-		}
-
-		void SetTri(PxU32* arr, int index, int a, int b, int c)
-		{
-			std::cout << "TRI(" << index << ") = " << a << "," << b << "," << c << std::endl;
-
-			arr[index] = a;
-			arr[index + 1] = b;
-			arr[index + 2] = c;
 		}
 	};
 
