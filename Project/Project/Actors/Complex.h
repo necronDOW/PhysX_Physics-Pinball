@@ -69,6 +69,7 @@ namespace PhysicsEngine
 		protected:
 			int cornerSize;
 			PxVec3* cornerData;
+			PxVec3 _center;
 
 		public:
 			Polygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
@@ -96,7 +97,22 @@ namespace PhysicsEngine
 					CreateShape(PxBoxGeometry(PxVec3(edgeLength, thickness, thickness * scale.z)), 1.f);
 					GetShape(i)->setLocalPose(PxTransform(cornerData[i] + (len / 2.f), PxQuat(atan2(len.y, len.x), PxVec3(0, 0, 1))));
 				}
+
+				_center = PxVec3(0);
+				for (int i = 0; i < cornerSize; i++)
+					_center += cornerData[i];
+				_center = pose.p + (_center / cornerSize);
 			}
+
+			void Materials(PxMaterial* material)
+			{
+				int shapeCount = GetShapes().size();
+
+				for (int i = 0; i < shapeCount; i++)
+					Material(material, i);
+			}
+
+			PxVec3 center() { return _center; }
 
 		private:
 			PxVec3 Rotate(PxVec3 original, PxReal rad)

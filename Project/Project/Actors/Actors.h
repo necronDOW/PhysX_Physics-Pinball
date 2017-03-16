@@ -10,14 +10,14 @@
 
 namespace PhysicsEngine
 {
-	class Trampoline
+	class Plunger
 	{
 		private:
 			vector<DistanceJoint*> springs;
 			Box *bottom, *top;
 
 		public:
-			Trampoline(const PxVec3& dimensions = PxVec3(1.f, 1.f, 1.f), PxReal stiffness = 1.f, PxReal damping = 1.f)
+			Plunger(const PxVec3& dimensions = PxVec3(1.f, 1.f, 1.f), PxReal stiffness = 1.f, PxReal damping = 1.f)
 			{
 				PxReal thickness = .1f;
 				bottom = new Box(PxTransform(PxVec3(0.f, thickness, 0.f)), PxVec3(dimensions.x, thickness, dimensions.z));
@@ -42,7 +42,7 @@ namespace PhysicsEngine
 				scene->Add(top);
 			}
 
-			~Trampoline()
+			~Plunger()
 			{
 				for (unsigned int i = 0; i < springs.size(); i++)
 					delete springs[i];
