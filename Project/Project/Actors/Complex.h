@@ -138,12 +138,12 @@ namespace PhysicsEngine
 			CappedPolygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1), CapMode top = None, CapMode bottom = None)
 				: Polygon(pose, edgeCount, thickness, scale)
 			{
-				Cap(top, thickness * scale.z, edgeCount);
-				Cap(bottom, -thickness * scale.z, edgeCount + 1);
+				Cap(top, thickness * scale.z + thickness, edgeCount, thickness);
+				Cap(bottom, -thickness * scale.z - thickness, edgeCount + 1, thickness);
 			}
 
 		private:
-			void Cap(CapMode mode, float yOffset, int shapeIndex)
+			void Cap(CapMode mode, float yOffset, int shapeIndex, float thickness)
 			{
 				if (mode == None)
 					return;
@@ -152,8 +152,8 @@ namespace PhysicsEngine
 				PxVec3* v = new PxVec3[vCount];
 				int midIndex = vCount / 2;
 
-				v[0] = PxVec3(0.f, 0.f, yOffset + .02f);
-				v[midIndex] = PxVec3(0.f, 0.f, yOffset - .02f);
+				v[0] = PxVec3(0.f, 0.f, yOffset + thickness);
+				v[midIndex] = PxVec3(0.f, 0.f, yOffset - thickness);
 
 				for (int i = 1; i < midIndex; i++)
 				{
