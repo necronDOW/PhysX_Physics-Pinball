@@ -35,6 +35,16 @@ namespace PhysicsEngine
 			}
 	};
 
+	class BoxStatic : public StaticActor
+	{
+		public:
+			BoxStatic(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, .5f, .5f), PxReal density = 1.f)
+				: StaticActor(pose)
+			{
+				CreateShape(PxBoxGeometry(dimensions), density);
+			}
+	};
+
 	class Capsule : public DynamicActor
 	{
 		public:

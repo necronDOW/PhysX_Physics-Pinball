@@ -14,14 +14,15 @@ namespace PhysicsEngine
 	{
 		private:
 			vector<DistanceJoint*> springs;
-			Box *bottom, *top;
+			BoxStatic *bottom;
+			Box *top;
 
 		public:
-			Plunger(const PxVec3& dimensions = PxVec3(1.f, 1.f, 1.f), PxReal stiffness = 1.f, PxReal damping = 1.f)
+			Plunger(const PxTransform& pose = PxTransform(PxIdentity), const PxVec3& dimensions = PxVec3(1.f, 1.f, 1.f), PxReal thickness = .1f, PxReal stiffness = 1.f, PxReal damping = 1.f)
 			{
-				PxReal thickness = .1f;
-				bottom = new Box(PxTransform(PxVec3(0.f, thickness, 0.f)), PxVec3(dimensions.x, thickness, dimensions.z));
-				top = new Box(PxTransform(PxVec3(0.f, dimensions.y + thickness, 0.f)), PxVec3(dimensions.x, thickness, dimensions.z));
+				bottom = new BoxStatic(PxTransform(pose.p + PxVec3(0.f, thickness, 0.f), pose.q), PxVec3(dimensions.x, thickness, dimensions.z));
+				top = new Box(PxTransform(pose.p + PxVec3(0.f, dimensions.y + thickness, 0.f), pose.q), PxVec3(dimensions.x, thickness, dimensions.z));
+
 				springs.resize(4);
 				springs[0] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x, thickness, dimensions.z)), top, PxTransform(PxVec3(dimensions.x, -dimensions.y, dimensions.z)));
 				springs[1] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x, thickness, -dimensions.z)), top, PxTransform(PxVec3(dimensions.x, -dimensions.y, -dimensions.z)));
@@ -33,7 +34,6 @@ namespace PhysicsEngine
 					springs[i]->stiffness(stiffness);
 					springs[i]->damping(damping);
 				}
-
 			}
 
 			void AddToScene(Scene* scene)

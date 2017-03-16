@@ -100,12 +100,13 @@ namespace PhysicsEngine
 	///Custom scene class
 	class MyScene : public Scene
 	{
-		Plane* plane;
-		CappedPolygon* poly;
-		Flipper* flipperL;
-		Flipper* flipperR;
-		Sphere* ball;
-		MySimulationEventCallback* my_callback;
+		Plane *plane;
+		Platform *platform;
+		Flipper *flipperL;
+		Flipper *flipperR;
+		Sphere *ball;
+		Plunger *plunger;
+		MySimulationEventCallback *my_callback;
 		
 		public:
 			MyScene() : Scene() {};
@@ -131,14 +132,17 @@ namespace PhysicsEngine
 				plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 				Add(plane);
 
-				poly = new CappedPolygon(PxTransform(PxVec3(.0f,7.f,.0f), Mathv::EulerToQuat(0, 0, -PxPi/4.f)), 4, .05f, PxVec3(5.f, 10.f, 5.f), CappedPolygon::Transparent, CappedPolygon::Opaque);
-				poly->Materials(MaterialLibrary::Instance().New("wood", 0.125f, 0.f, 0.603f));
-				Add(poly);
+				platform = new Platform(PxTransform(PxVec3(.0f,7.f,.0f), Mathv::EulerToQuat(0, 0, -PxPi/4.f)), 4, .05f, PxVec3(5.f, 10.f, 5.f));
+				platform->Materials(MaterialLibrary::Instance().New("wood", 0.125f, 0.f, 0.603f));
+				Add(platform);
 
-				ball = new Sphere(PxTransform(poly->center() + PxVec3(1, 0, 0)), .1f, 1.f);
+				ball = new Sphere(platform->RelativeTransform(PxVec2(.3f, .9f)), .1f, 1.f);
 				ball->Material(MaterialLibrary::Instance().New("steel", 0.25f, 0.f, 0.597f), 0);
 				ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 				Add(ball);
+
+				plunger = new Plunger(PxTransform(PxVec3(.0f, 7.f, .0f), Mathv::EulerToQuat(0, 0, -PxPi / 4.f)), PxVec3(.24f), .05f, 100.f, 1.f);
+				plunger->AddToScene(this);
 
 				flipperL = new Flipper(this, PxVec3(-1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, PxHalfPi), .9f, 20.f, -PxPi/4.f, PxPi/4.f);
 				flipperR = new Flipper(this, PxVec3(1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, -PxHalfPi), .9f, -20.f, -PxPi / 4.f, PxPi / 4.f);

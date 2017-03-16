@@ -2,6 +2,7 @@
 #define complexactors_h
 
 #include "../PhysicsEngine.h"
+#include "../Extras//Helper.h"
 
 namespace PhysicsEngine
 {
@@ -84,7 +85,7 @@ namespace PhysicsEngine
 
 				for (int i = 0; i < edgeCount; i++)
 				{
-					cornerData[i] = Rotate(radiusVec, angle).multiply(scale);
+					cornerData[i] = Mathv::Rotate(radiusVec, angle, PxVec3(1, 0, 0)).multiply(scale);
 					angle += angleVarience;
 				}
 
@@ -115,18 +116,10 @@ namespace PhysicsEngine
 			PxVec3 center() { return _center; }
 
 		private:
-			PxVec3 Rotate(PxVec3 original, PxReal rad)
-			{
-				PxReal cO = cos(rad);
-				PxReal sO = sin(rad);
-
-				return PxVec3(cO*original.x - sO*original.y, sO*original.x + cO*original.y, original.z);
-			}
-
 			float Edge(float radius, float angleVarience)
 			{
 				PxVec3 start = PxVec3(0.f, radius, 0.f);
-				PxVec3 next = Rotate(start, angleVarience);
+				PxVec3 next = Mathv::Rotate(start, angleVarience, PxVec3(1, 0, 0));
 
 				return (next - start).magnitude();
 			}
@@ -134,45 +127,68 @@ namespace PhysicsEngine
 
 	class CappedPolygon : public Polygon
 	{
-	public:
-		enum CapMode
-		{
-			None,
-			Opaque,
-			Transparent
-		};
-
-		CappedPolygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1), CapMode top = None, CapMode bottom = None)
-			: Polygon(pose, edgeCount, thickness, scale)
-		{
-			Cap(top, thickness * scale.z, edgeCount);
-			Cap(bottom, -thickness * scale.z, edgeCount + 1);
-		}
-
-	private:
-		void Cap(CapMode mode, float yOffset, int shapeIndex)
-		{
-			if (mode == None)
-				return;
-
-			PxU32 vCount = cornerSize * 2 + 2;
-			PxVec3* v = new PxVec3[vCount];
-			int midIndex = vCount / 2;
-
-			v[0] = PxVec3(0.f, 0.f, yOffset + .02f);
-			v[midIndex] = PxVec3(0.f, 0.f, yOffset - .02f);
-
-			for (int i = 1; i < midIndex; i++)
+		public:
+			enum CapMode
 			{
-				v[i] = cornerData[i-1] + v[0];
-				v[midIndex+i] = cornerData[i-1] + v[midIndex];
+				None,
+				Opaque,
+				Transparent
+			};
+
+			CappedPolygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1), CapMode top = None, CapMode bottom = None)
+				: Polygon(pose, edgeCount, thickness, scale)
+			{
+				Cap(top, thickness * scale.z, edgeCount);
+				Cap(bottom, -thickness * scale.z, edgeCount + 1);
 			}
 
-			CreateShape(PxConvexMeshGeometry(ConvexMesh::CookMesh(vector<PxVec3>(&v[0], &v[vCount-1]))), 1.f);
+		private:
+			void Cap(CapMode mode, float yOffset, int shapeIndex)
+			{
+				if (mode == None)
+					return;
 
-			if (mode == Transparent)
-				GetShape(shapeIndex)->setFlag(PxShapeFlag::eVISUALIZATION, false);
-		}
+				PxU32 vCount = cornerSize * 2 + 2;
+				PxVec3* v = new PxVec3[vCount];
+				int midIndex = vCount / 2;
+
+				v[0] = PxVec3(0.f, 0.f, yOffset + .02f);
+				v[midIndex] = PxVec3(0.f, 0.f, yOffset - .02f);
+
+				for (int i = 1; i < midIndex; i++)
+				{
+					v[i] = cornerData[i-1] + v[0];
+					v[midIndex+i] = cornerData[i-1] + v[midIndex];
+				}
+
+				CreateShape(PxConvexMeshGeometry(ConvexMesh::CookMesh(vector<PxVec3>(&v[0], &v[vCount-1]))), 1.f);
+
+				if (mode == Transparent)
+					GetShape(shapeIndex)->setFlag(PxShapeFlag::eVISUALIZATION, false);
+			}
+	};
+
+	class Platform : public CappedPolygon
+	{
+		protected:
+			PxVec3 _halfExtents;
+			PxTransform _transform;
+
+		public:
+			Platform(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
+				: CappedPolygon(pose, edgeCount, thickness, scale, CapMode::Transparent, CapMode::Opaque)
+			{
+				_transform = pose;
+
+				PxReal rad = pose.q.getAngle();
+				_halfExtents = Mathv::Rotate(cornerData[0].abs(), rad, PxVec3(0, 0, 1));
+			}
+			
+			PxTransform RelativeTransform(PxVec2 offset)
+			{
+				PxVec3 localPosition = _halfExtents.multiply(PxVec3(offset.x, offset.y, -offset.y));
+				return PxTransform(_transform.p + localPosition);
+			}
 	};
 
 	class Wedge : public DynamicActor
