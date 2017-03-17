@@ -54,6 +54,20 @@ PxVec3 Mathv::Max(PxVec3* values, int size)
 	return maxV;
 }
 
+std::vector<PxVec3> Mathv::Plot(PxVec3 start, float startRads, float radVarience, PxVec3 scalar)
+{
+	int size = PxPi / startRads;
+	std::vector<PxVec3> arr = std::vector<PxVec3>(size);
+
+	for (int i = 0; i < size; i++)
+	{
+		arr[i] = Rotate(start, startRads, PxVec3(1, 0, 0)).multiply(scalar);
+		startRads += radVarience;
+	}
+
+	return arr;
+}
+
 void IO::Debug(PxVec3 v)
 {
 	std::cout << v.x << "," << v.y << "," << v.z << std::endl;

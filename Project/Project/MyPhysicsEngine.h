@@ -10,8 +10,7 @@ namespace PhysicsEngine
 {
 	using namespace std;
 
-	static const PxVec3 color_palette[] = {PxVec3(46.f/255.f,9.f/255.f,39.f/255.f),PxVec3(217.f/255.f,0.f/255.f,0.f/255.f),
-		PxVec3(255.f/255.f,45.f/255.f,0.f/255.f),PxVec3(255.f/255.f,140.f/255.f,54.f/255.f),PxVec3(4.f/255.f,117.f/255.f,111.f/255.f)};
+	static const PxVec3 color_palette[] = { PxVec3(.3f), PxVec3(1.f,.3f,.3f) };
 
 	struct FilterGroup
 	{
@@ -84,8 +83,9 @@ namespace PhysicsEngine
 			return PxFilterFlags();
 		}
 
-		pairFlags = PxPairFlag::eCONTACT_DEFAULT;
-//		pairFlags |= PxPairFlag::eCCD_LINEAR;
+		pairFlags = PxPairFlag::eSOLVE_CONTACT;
+		pairFlags |= PxPairFlag::eDETECT_DISCRETE_CONTACT;
+		pairFlags |= PxPairFlag::eDETECT_CCD_CONTACT;
 		
 		if((filterData0.word0 & filterData1.word1) && (filterData1.word0 & filterData0.word1))
 		{
@@ -109,7 +109,7 @@ namespace PhysicsEngine
 		MySimulationEventCallback *my_callback;
 		
 		public:
-			MyScene() : Scene() {};
+			MyScene() : Scene(CustomFilterShader) {};
 
 			void SetVisualisation()
 			{
@@ -127,13 +127,17 @@ namespace PhysicsEngine
 
 				my_callback = new MySimulationEventCallback();
 				px_scene->setSimulationEventCallback(my_callback);
+				px_scene->setFlag(PxSceneFlag::eENABLE_CCD, true);
+
+				float angleZ = -PxPi / 4.f;
 
 				plane = new Plane();
 				plane->Color(PxVec3(210.f/255.f,210.f/255.f,210.f/255.f));
 				Add(plane);
 
-				platform = new Platform(PxTransform(PxVec3(.0f,7.f,.0f), Mathv::EulerToQuat(0, 0, -PxPi/4.f)), 4, .05f, PxVec3(5.f, 10.f, 5.f));
+				platform = new Platform(PxTransform(PxVec3(.0f,7.f,.0f), Mathv::EulerToQuat(0, 0, angleZ)), 4, .05f, PxVec3(5.f, 10.f, 5.f));
 				platform->Materials(MaterialLibrary::Instance().New("wood", 0.125f, 0.f, 0.603f));
+				platform->SetColor(color_palette[1], color_palette[0]);
 				Add(platform);
 
 				ball = new Sphere(platform->RelativeTransform(PxVec2(.3f, .9f)), .1f, 1.f);
@@ -141,11 +145,15 @@ namespace PhysicsEngine
 				ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 				Add(ball);
 
-				plunger = new Plunger(PxTransform(PxVec3(.0f, 7.f, .0f), Mathv::EulerToQuat(0, 0, -PxPi / 4.f)), PxVec3(.24f), .05f, 100.f, 1.f);
+				plunger = new Plunger(PxTransform(platform->RelativeTransform(PxVec2(.8f, -.9f)).p, Mathv::EulerToQuat(0, 0, angleZ)), PxVec3(.24f), .05f, 100.f, 1.f);
+				plunger->SetColor(color_palette[1]);
 				plunger->AddToScene(this);
 
-				flipperL = new Flipper(this, PxVec3(-1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, PxHalfPi), .9f, 20.f, -PxPi/4.f, PxPi/4.f);
-				flipperR = new Flipper(this, PxVec3(1.5f, 3.f, 4.f), PxVec3(-PxPi / 4, PxHalfPi, -PxHalfPi), .9f, -20.f, -PxPi / 4.f, PxPi / 4.f);
+				flipperL = new Flipper(this, platform->RelativeTransform(PxVec2(-.4f, -.8f)).p, PxVec3(angleZ, PxHalfPi, PxHalfPi), .9f, 20.f, -PxPi/4.f, PxPi/4.f);
+				flipperL->SetColor(color_palette[1]);
+
+				flipperR = new Flipper(this, platform->RelativeTransform(PxVec2(.4f, -.8f)).p, PxVec3(angleZ, PxHalfPi, -PxHalfPi), .9f, -20.f, -PxPi / 4.f, PxPi / 4.f);
+				flipperR->SetColor(color_palette[1]);
 			}
 
 			virtual void CustomUpdate() 

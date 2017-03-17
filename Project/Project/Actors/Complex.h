@@ -68,41 +68,32 @@ namespace PhysicsEngine
 	class Polygon : public StaticActor
 	{
 		protected:
-			int cornerSize;
-			PxVec3* cornerData;
+			std::vector<PxVec3> _corners;
 			PxVec3 _center;
 
 		public:
 			Polygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
 				: StaticActor(pose)
 			{
-				cornerSize = edgeCount;
-				cornerData = new PxVec3[cornerSize];
-
-				PxVec3 radiusVec = PxVec3(0.f, 1.f, 0.f);
 				float angleVarience = (PxPi * 2.f) / (float)edgeCount;
 				float angle = (edgeCount % 2 != 0) ? angleVarience : angleVarience / 2.f;
 
-				for (int i = 0; i < edgeCount; i++)
-				{
-					cornerData[i] = Mathv::Rotate(radiusVec, angle, PxVec3(1, 0, 0)).multiply(scale);
-					angle += angleVarience;
-				}
+				_corners = Mathv::Plot(PxVec3(0.f, 1.f, 0.f), angle, angleVarience, scale);
 
 				for (int i = 0; i < edgeCount; i++)
 				{
-					PxVec3 end = (i < edgeCount - 1) ? cornerData[i + 1] : cornerData[0];
-					PxVec3 len = end - cornerData[i];
+					PxVec3 end = (i < edgeCount - 1) ? _corners[i + 1] : _corners[0];
+					PxVec3 len = end - _corners[i];
 					float edgeLength = len.magnitude() / 2.f;
 
 					CreateShape(PxBoxGeometry(PxVec3(edgeLength, thickness, thickness * scale.z)), 1.f);
-					GetShape(i)->setLocalPose(PxTransform(cornerData[i] + (len / 2.f), PxQuat(atan2(len.y, len.x), PxVec3(0, 0, 1))));
+					GetShape(i)->setLocalPose(PxTransform(_corners[i] + (len / 2.f), PxQuat(atan2(len.y, len.x), PxVec3(0, 0, 1))));
 				}
 
 				_center = PxVec3(0);
-				for (int i = 0; i < cornerSize; i++)
-					_center += cornerData[i];
-				_center = pose.p + (_center / cornerSize);
+				for (int i = 0; i < _corners.size(); i++)
+					_center += _corners[i];
+				_center = pose.p + (_center / _corners.size());
 			}
 
 			void Materials(PxMaterial* material)
@@ -111,6 +102,12 @@ namespace PhysicsEngine
 
 				for (int i = 0; i < shapeCount; i++)
 					Material(material, i);
+			}
+
+			void SetColor(PxVec3 rgb)
+			{
+				for (int i = 0; i < _corners.size(); i++)
+					Color(rgb, i);
 			}
 
 			PxVec3 center() { return _center; }
@@ -142,13 +139,21 @@ namespace PhysicsEngine
 				Cap(bottom, -thickness * scale.z - thickness, edgeCount + 1, thickness);
 			}
 
+			void SetColor(PxVec3 wallsRGB, PxVec3 platRGB)
+			{
+				Polygon::SetColor(wallsRGB);
+
+				for (int i = 0; i < 2; i++)
+					Color(platRGB, _corners.size() + i);
+			}
+
 		private:
 			void Cap(CapMode mode, float yOffset, int shapeIndex, float thickness)
 			{
 				if (mode == None)
 					return;
 
-				PxU32 vCount = cornerSize * 2 + 2;
+				PxU32 vCount = _corners.size() * 2 + 2;
 				PxVec3* v = new PxVec3[vCount];
 				int midIndex = vCount / 2;
 
@@ -157,8 +162,8 @@ namespace PhysicsEngine
 
 				for (int i = 1; i < midIndex; i++)
 				{
-					v[i] = cornerData[i-1] + v[0];
-					v[midIndex+i] = cornerData[i-1] + v[midIndex];
+					v[i] = _corners[i-1] + v[0];
+					v[midIndex+i] = _corners[i-1] + v[midIndex];
 				}
 
 				CreateShape(PxConvexMeshGeometry(ConvexMesh::CookMesh(vector<PxVec3>(&v[0], &v[vCount-1]))), 1.f);
@@ -181,7 +186,7 @@ namespace PhysicsEngine
 				_transform = pose;
 
 				PxReal rad = pose.q.getAngle();
-				_halfExtents = Mathv::Rotate(cornerData[0].abs(), rad, PxVec3(0, 0, 1));
+				_halfExtents = Mathv::Rotate(_corners[0].abs(), rad, PxVec3(0, 0, 1));
 			}
 			
 			PxTransform RelativeTransform(PxVec2 offset)
