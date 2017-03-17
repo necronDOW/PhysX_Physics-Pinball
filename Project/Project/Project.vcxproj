@@ -140,7 +140,9 @@
     <ClInclude Include="Extras\HUD.h" />
     <ClInclude Include="Extras\MaterialLibrary.h" />
     <ClInclude Include="Extras\Renderer.h" />
+    <ClInclude Include="Extras\Triggers.h" />
     <ClInclude Include="Extras\UserData.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="MyPhysicsEngine.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="VisualDebugger.h" />
@@ -151,6 +153,8 @@
     <ClCompile Include="Extras\Helper.cpp" />
     <ClCompile Include="Extras\MaterialLibrary.cpp" />
     <ClCompile Include="Extras\Renderer.cpp" />
+    <ClCompile Include="Extras\Triggers.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="VisualDebugger.cpp" />

@@ -81,6 +81,21 @@ namespace PhysicsEngine
 			{
 				joint->driveVelocity(-joint->driveVelocity());
 			}
+
+			void SetMaterial(PxMaterial* material)
+			{
+				wedge->Material(material, 0);
+			}
+	};
+
+	class Pinball : public Sphere
+	{
+		public:
+			Pinball(const PxTransform& pose = PxTransform(PxIdentity), PxReal radius = 1.f, PxReal density = 1.f)
+				: Sphere(pose, radius, density)
+			{
+
+			}
 	};
 }
 

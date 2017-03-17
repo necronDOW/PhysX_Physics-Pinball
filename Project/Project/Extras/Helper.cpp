@@ -12,14 +12,6 @@ PxQuat Mathv::EulerToQuat(float x, float y, float z)
 	return physx::PxQuat(s1*s2*c3 + c1*c2*s3, s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3, c1*c2*c3 - s1*s2*s3);
 }
 
-PxVec3 Mathv::Rotate(PxVec3 v, PxReal rad)
-{
-	PxReal cO = cos(rad);
-	PxReal sO = sin(rad);
-
-	return PxVec3(cO*v.x - sO*v.y, sO*v.x + cO*v.y, v.z);
-}
-
 PxVec3 Mathv::Rotate(PxVec3 v, PxReal rad, PxVec3 axis)
 {
 	PxReal c = cos(rad);
@@ -56,7 +48,7 @@ PxVec3 Mathv::Max(PxVec3* values, int size)
 
 std::vector<PxVec3> Mathv::Plot(PxVec3 start, float startRads, float radVarience, PxVec3 scalar)
 {
-	int size = PxPi / startRads;
+	int size = (PxPi * 2.f) / radVarience;
 	std::vector<PxVec3> arr = std::vector<PxVec3>(size);
 
 	for (int i = 0; i < size; i++)

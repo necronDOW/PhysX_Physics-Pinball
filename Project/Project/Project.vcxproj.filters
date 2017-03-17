@@ -72,6 +72,12 @@
     <ClInclude Include="Extras\MaterialLibrary.h">
       <Filter>Header Files\Extras</Filter>
     </ClInclude>
+    <ClInclude Include="Extras\Triggers.h">
+      <Filter>Header Files\Extras</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PhysicsEngine.cpp">
@@ -97,6 +103,12 @@
     </ClCompile>
     <ClCompile Include="Extras\MaterialLibrary.cpp">
       <Filter>Source Files\Extras</Filter>
+    </ClCompile>
+    <ClCompile Include="Extras\Triggers.cpp">
+      <Filter>Source Files\Extras</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -23,7 +23,7 @@ namespace VisualDebugger
 		Renderer::InitWindow(window_name, width, height);
 		Renderer::Init();
 
-		camera = new Camera(PxVec3(0.0f, 13.0f, 15.0f), PxVec3(0.f,-2.f,-4.f), 5.f);
+		camera = new Camera(PxVec3(0.0f, 11.5f, 11.5f), PxVec3(0.f,-2.f,-4.f), 5.f);
 
 		HUDInit();
 
@@ -166,23 +166,22 @@ namespace VisualDebugger
 	{
 		switch (key)
 		{
-		case GLUT_KEY_F5: hud_show = !hud_show;
-			break;
-		case GLUT_KEY_F6: Renderer::ShowShadows(!Renderer::ShowShadows());
-			break;
-		case GLUT_KEY_F7: ToggleRenderMode();
-			break;
-		case GLUT_KEY_F8: camera->Reset();
-			break;
-
-		case GLUT_KEY_F9: scene->SelectNextActor();
-			break;
-		case GLUT_KEY_F10: scene->Pause(!scene->Pause());
-			break;
-		case GLUT_KEY_F12: scene->Reset();
-			break;
-		default:
-			break;
+			case GLUT_KEY_F5: hud_show = !hud_show;
+				break;
+			case GLUT_KEY_F6: Renderer::ShowShadows(!Renderer::ShowShadows());
+				break;
+			case GLUT_KEY_F7: ToggleRenderMode();
+				break;
+			case GLUT_KEY_F8: camera->Reset();
+				break;
+			case GLUT_KEY_F9: scene->SelectNextActor();
+				break;
+			case GLUT_KEY_F10: scene->Pause(!scene->Pause());
+				break;
+			case GLUT_KEY_F12: scene->Reset();
+				break;
+			default:
+				break;
 		}
 	}
 

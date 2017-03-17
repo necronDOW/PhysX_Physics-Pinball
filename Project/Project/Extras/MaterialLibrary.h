@@ -31,10 +31,10 @@ class MaterialLibrary
 
 	private:
 		/// SINGLETON
+		static MaterialLibrary* _instance;
 		MaterialLibrary() {}
 		MaterialLibrary(const MaterialLibrary* o) { }
 		~MaterialLibrary();
-		static MaterialLibrary* _instance;
 		/// SINGLETON
 
 		vector<Material*> _materials;
