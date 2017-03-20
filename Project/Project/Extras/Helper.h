@@ -16,6 +16,7 @@ class Mathv
 		static PxVec3 Max(PxVec3* values, int size);
 		static std::vector<PxVec3> Plot(PxVec3 start, float startRads, float radVarience, PxVec3 scalar = PxVec3(1.f));
 		static PxVec3 Multiply(PxQuat quat, PxVec3 vec);
+		static PxTransform Multiply(PxTransform t, PxQuat q);
 };
 
 class IO

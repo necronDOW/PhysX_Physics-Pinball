@@ -88,15 +88,15 @@ namespace PhysicsEngine
 				ball->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 				Add(ball);
 
-				plunger = new Plunger(PxTransform(platform->RelativeTransform(PxVec3(.8f, -.8f, -0.1f)).p, Mathv::EulerToQuat(0, 0, angleZ)), PxVec3(.2f), .3f, .05f, 300.0f, 1.f);
+				plunger = new Plunger(platform->RelativeTransform(PxVec3(.8f, -.8f, -0.1f)), PxVec3(.2f), .3f, .05f, 300.0f, 1.f);
 				plunger->SetColor(color_palette[1]);
 				plunger->AddToScene(this);
 
-				flipperL = new Flipper(this, platform->RelativeTransform(PxVec3(-.4f, -.7f, .0f)).p, PxVec3(angleZ, PxHalfPi, PxHalfPi), .9f, 20.f, -PxPi/4.f, PxPi/4.f);
+				flipperL = new Flipper(this, Mathv::Multiply(platform->RelativeTransform(PxVec3(-.4f, -.7f, .0f)), Mathv::EulerToQuat(0, PxHalfPi, PxHalfPi)), .9f, 20.f, -PxPi/4.f, PxPi/4.f);
 				flipperL->SetMaterial(MaterialLibrary::Instance().Get("wood"));
 				flipperL->SetColor(color_palette[1]);
 
-				flipperR = new Flipper(this, platform->RelativeTransform(PxVec3(.4f, -.7f, .0f)).p, PxVec3(angleZ, PxHalfPi, -PxHalfPi), .9f, -20.f, -PxPi / 4.f, PxPi / 4.f);
+				flipperR = new Flipper(this, Mathv::Multiply(platform->RelativeTransform(PxVec3(.4f, -.7f, .0f)), Mathv::EulerToQuat(0, PxHalfPi, -PxHalfPi)), .9f, -20.f, -PxPi / 4.f, PxPi / 4.f);
 				flipperR->SetMaterial(MaterialLibrary::Instance().Get("wood"));
 				flipperR->SetColor(color_palette[1]);
 			}

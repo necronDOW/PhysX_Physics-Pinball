@@ -65,7 +65,8 @@ void IO::Debug(PxVec3 v)
 	std::cout << v.x << "," << v.y << "," << v.z << std::endl;
 }
 
-PxVec3 Mathv::Multiply(PxQuat quat, PxVec3 vec) {
+PxVec3 Mathv::Multiply(PxQuat quat, PxVec3 vec)
+{
 	float num = quat.x * 2.f;
 	float num2 = quat.y * 2.f;
 	float num3 = quat.z * 2.f;
@@ -84,4 +85,9 @@ PxVec3 Mathv::Multiply(PxQuat quat, PxVec3 vec) {
 	result.y = (num7 + num12) * vec.x + (1.f - (num4 + num6)) * vec.y + (num9 - num10) * vec.z;
 	result.z = (num8 - num11) * vec.x + (num9 + num10) * vec.y + (1.f - (num4 + num5)) * vec.z;
 	return result;
+}
+
+PxTransform Mathv::Multiply(PxTransform t, PxQuat q)
+{
+	return PxTransform(t.p, t.q * q);
 }

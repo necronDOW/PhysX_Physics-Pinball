@@ -190,7 +190,7 @@ namespace PhysicsEngine
 			PxTransform RelativeTransform(PxVec3 offset)
 			{
 				PxVec3 halfExtents2D = PxVec3(_halfExtents.x, _halfExtents.y, 1.f);
-				return PxTransform(_center + Mathv::Multiply(_transform.q, offset.multiply(halfExtents2D)));
+				return PxTransform(_center + Mathv::Multiply(_transform.q, offset.multiply(halfExtents2D)), _transform.q);
 			}
 	};
 
