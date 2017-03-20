@@ -68,12 +68,13 @@ namespace PhysicsEngine
 	class Polygon : public StaticActor
 	{
 		protected:
+			PxTransform _transform;
 			std::vector<PxVec3> _corners;
 			PxVec3 _center;
 
 		public:
-			Polygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
-				: StaticActor(pose)
+			Polygon(PxVec3 pos = PxVec3(0), PxVec3 rot = PxVec3(0), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
+				: StaticActor(_transform = PxTransform(pos, Mathv::EulerToQuat(rot.x, rot.y, rot.z)))
 			{
 				float angleVarience = (PxPi * 2.f) / (float)edgeCount;
 				float angle = (edgeCount % 2 != 0) ? angleVarience : angleVarience / 2.f;
@@ -93,7 +94,7 @@ namespace PhysicsEngine
 				_center = PxVec3(0);
 				for (int i = 0; i < _corners.size(); i++)
 					_center += _corners[i];
-				_center = pose.p + (_center / _corners.size());
+				_center = _transform.p + (_center / _corners.size());
 			}
 
 			void Materials(PxMaterial* material)
@@ -132,8 +133,8 @@ namespace PhysicsEngine
 				Transparent
 			};
 
-			CappedPolygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1), CapMode top = None, CapMode bottom = None)
-				: Polygon(pose, edgeCount, thickness, scale)
+			CappedPolygon(PxVec3 pos = PxVec3(0), PxVec3 rot = PxVec3(0), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1), CapMode top = None, CapMode bottom = None)
+				: Polygon(pos, rot, edgeCount, thickness, scale)
 			{
 				Cap(top, thickness * scale.z + thickness, edgeCount, thickness);
 				Cap(bottom, -thickness * scale.z - thickness, edgeCount + 1, thickness);
@@ -177,22 +178,19 @@ namespace PhysicsEngine
 	{
 		protected:
 			PxVec3 _halfExtents;
-			PxTransform _transform;
 
 		public:
-			Platform(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
-				: CappedPolygon(pose, edgeCount, thickness, scale, CapMode::Transparent, CapMode::Opaque)
+			Platform(PxVec3 pos = PxVec3(0), PxVec3 rot = PxVec3(0), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
+				: CappedPolygon(pos, rot, edgeCount, thickness, scale, CapMode::Transparent, CapMode::Opaque)
 			{
-				_transform = pose;
-
-				PxReal rad = pose.q.getAngle();
-				_halfExtents = Mathv::Rotate(_corners[0].abs(), rad, PxVec3(0, 0, 1));
+				PxReal rad = _transform.q.getAngle();
+				_halfExtents = _corners[0].abs();
 			}
 			
-			PxTransform RelativeTransform(PxVec2 offset)
+			PxTransform RelativeTransform(PxVec3 offset)
 			{
-				PxVec3 localPosition = _halfExtents.multiply(PxVec3(offset.x, offset.y, -offset.y));
-				return PxTransform(_transform.p + localPosition);
+				PxVec3 halfExtents2D = PxVec3(_halfExtents.x, _halfExtents.y, 1.f);
+				return PxTransform(_center + Mathv::Multiply(_transform.q, offset.multiply(halfExtents2D)));
 			}
 	};
 

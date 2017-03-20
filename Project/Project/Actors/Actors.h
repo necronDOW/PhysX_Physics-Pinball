@@ -18,16 +18,16 @@ namespace PhysicsEngine
 			Box *top;
 
 		public:
-			Plunger(const PxTransform& pose = PxTransform(PxIdentity), const PxVec3& dimensions = PxVec3(1.f, 1.f, 1.f), PxReal thickness = .1f, PxReal stiffness = 1.f, PxReal damping = 1.f)
+			Plunger(const PxTransform& pose = PxTransform(PxIdentity), const PxVec3& dimensions = PxVec3(1.f, 1.f, 1.f), PxReal surfaceDistance = 1.f, PxReal thickness = .1f, PxReal stiffness = 1.f, PxReal damping = 1.f)
 			{
 				bottom = new BoxStatic(PxTransform(pose.p + PxVec3(0.f, thickness, 0.f), pose.q), PxVec3(dimensions.x, thickness, dimensions.z));
 				top = new Box(PxTransform(pose.p + PxVec3(0.f, dimensions.y + thickness, 0.f), pose.q), PxVec3(dimensions.x, thickness, dimensions.z));
 
 				springs.resize(4);
-				springs[0] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x, thickness, dimensions.z)), top, PxTransform(PxVec3(dimensions.x, -dimensions.y, dimensions.z)));
-				springs[1] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x, thickness, -dimensions.z)), top, PxTransform(PxVec3(dimensions.x, -dimensions.y, -dimensions.z)));
-				springs[2] = new DistanceJoint(bottom, PxTransform(PxVec3(-dimensions.x, thickness, dimensions.z)), top, PxTransform(PxVec3(-dimensions.x, -dimensions.y, dimensions.z)));
-				springs[3] = new DistanceJoint(bottom, PxTransform(PxVec3(-dimensions.x, thickness, -dimensions.z)), top, PxTransform(PxVec3(-dimensions.x, -dimensions.y, -dimensions.z)));
+				springs[0] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x, thickness, dimensions.z)), top, PxTransform(PxVec3(dimensions.x, -surfaceDistance, dimensions.z)));
+				springs[1] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x, thickness, -dimensions.z)), top, PxTransform(PxVec3(dimensions.x, -surfaceDistance, -dimensions.z)));
+				springs[2] = new DistanceJoint(bottom, PxTransform(PxVec3(-dimensions.x, thickness, dimensions.z)), top, PxTransform(PxVec3(-dimensions.x, -surfaceDistance, dimensions.z)));
+				springs[3] = new DistanceJoint(bottom, PxTransform(PxVec3(-dimensions.x, thickness, -dimensions.z)), top, PxTransform(PxVec3(-dimensions.x, -surfaceDistance, -dimensions.z)));
 
 				for (unsigned int i = 0; i < springs.size(); i++)
 				{
