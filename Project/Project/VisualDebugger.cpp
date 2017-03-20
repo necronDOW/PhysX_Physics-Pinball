@@ -142,8 +142,9 @@ namespace VisualDebugger
 
 		switch (toupper(key))
 		{
-			case 'R':
-				scene->Hit();
+			case ',': scene->HitL();
+				break;
+			case '.': scene->HitR();
 				break;
 			default:
 				break;
@@ -191,8 +192,9 @@ namespace VisualDebugger
 
 		switch (toupper(key))
 		{
-			case 'R':
-				scene->Hit();
+			case ',': scene->HitL();
+				break;
+			case '.': scene->HitR();
 				break;
 			default:
 				break;

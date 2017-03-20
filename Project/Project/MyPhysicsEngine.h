@@ -106,9 +106,13 @@ namespace PhysicsEngine
 				
 			}
 
-			void Hit()
+			void HitL()
 			{
 				flipperL->InvertDrive();
+			}
+
+			void HitR()
+			{
 				flipperR->InvertDrive();
 			}
 	};
