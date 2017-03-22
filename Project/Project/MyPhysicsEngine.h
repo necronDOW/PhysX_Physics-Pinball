@@ -12,7 +12,7 @@ namespace PhysicsEngine
 	using namespace std;
 
 	static const PxReal PxQuartPi = PxHalfPi / 2.f;
-	static const PxVec3 color_palette[] = { PxVec3(1.f), PxVec3(.3f), PxVec3(1.f,.3f,.3f), PxVec3(.3f,.3f,1.f) };
+	static const PxVec3 color_palette[] = { PxVec3(1.f), PxVec3(.2f), PxVec3(1.f,.3f,.3f), PxVec3(.3f,.3f,1.f) };
 
 	static PxFilterFlags CustomFilterShader( PxFilterObjectAttributes attributes0,	PxFilterData filterData0,
 		PxFilterObjectAttributes attributes1,	PxFilterData filterData1,
@@ -84,7 +84,7 @@ namespace PhysicsEngine
 				platform->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 				Add(platform);
 
-				ball = new Sphere(platform->RelativeTransform(PxVec2(.9475f, -.4f)), .09f, 1.f);
+				ball = new Sphere(platform->RelativeTransform(PxVec2(.9475f, -.4f)), .1f, 1.f);
 				ball->Material(MaterialLibrary::Instance().New("steel", 0.25f, 0.f, 0.597f), 0);
 				ball->Color(color_palette[3]);
 				ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
@@ -111,6 +111,8 @@ namespace PhysicsEngine
 				AddWall(PxVec2(.755f, -0.1525f), PxQuartPi * 2.75f, 1.25f, 3, .125f);
 				AddWall(PxVec2(.5f, .725f), PxHalfPi + PxQuartPi, 2.f, 4, .225f);
 				AddWall(PxVec2(.755f, .2125f), PxQuartPi*1.25f, 1.25f, 3, .15f);
+
+				// Central Walls
 				AddWall(PxVec2(.45f, .475f), PxHalfPi, 1.5f, 4, .25f);
 			}
 
