@@ -14,20 +14,26 @@ namespace PhysicsEngine
 	{
 		private:
 			vector<DistanceJoint*> springs;
+			BoxStatic* walls[2];
 			BoxStatic *bottom;
 			Box *top;
 
 		public:
 			Plunger(const PxTransform& pose = PxTransform(PxIdentity), const PxVec3& dimensions = PxVec3(1.f, 1.f, 1.f), PxReal surfaceDistance = 1.f, PxReal thickness = .1f, PxReal stiffness = 1.f, PxReal damping = 1.f)
 			{
-				bottom = new BoxStatic(PxTransform(pose.p + PxVec3(0.f, thickness, 0.f), pose.q), PxVec3(dimensions.x, thickness, dimensions.z));
-				top = new Box(PxTransform(pose.p + PxVec3(0.f, dimensions.y + thickness, 0.f), pose.q), PxVec3(dimensions.x, thickness, dimensions.z));
+				bottom = new BoxStatic(PxTransform(pose.p + PxVec3(0.f, 0.f, 0.f), pose.q), PxVec3(dimensions.x, thickness, dimensions.z));
+				top = new Box(PxTransform(pose.p + PxVec3(0.f, 0.f, 0.f), pose.q), PxVec3(dimensions.x, thickness, dimensions.z));
+				top->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+
+				PxReal wallLength = (surfaceDistance / 2.f) + thickness;
+				walls[0] = new BoxStatic(PxTransform(pose.p + Mathv::Multiply(pose.q, PxVec3(dimensions.x + thickness, surfaceDistance/2.f, 0.f)), pose.q), PxVec3(thickness*.95f, wallLength, dimensions.z));
+				walls[1] = new BoxStatic(PxTransform(pose.p + Mathv::Multiply(pose.q, PxVec3(-dimensions.x - thickness, surfaceDistance/2.f, 0.f)), pose.q), PxVec3(thickness*.95f, wallLength, dimensions.z));
 
 				springs.resize(4);
-				springs[0] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x, thickness, dimensions.z)), top, PxTransform(PxVec3(dimensions.x, -surfaceDistance, dimensions.z)));
-				springs[1] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x, thickness, -dimensions.z)), top, PxTransform(PxVec3(dimensions.x, -surfaceDistance, -dimensions.z)));
-				springs[2] = new DistanceJoint(bottom, PxTransform(PxVec3(-dimensions.x, thickness, dimensions.z)), top, PxTransform(PxVec3(-dimensions.x, -surfaceDistance, dimensions.z)));
-				springs[3] = new DistanceJoint(bottom, PxTransform(PxVec3(-dimensions.x, thickness, -dimensions.z)), top, PxTransform(PxVec3(-dimensions.x, -surfaceDistance, -dimensions.z)));
+				springs[0] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x, 0.f, dimensions.z)), top, PxTransform(PxVec3(dimensions.x, -surfaceDistance, dimensions.z)));
+				springs[1] = new DistanceJoint(bottom, PxTransform(PxVec3(dimensions.x, 0.f, -dimensions.z)), top, PxTransform(PxVec3(dimensions.x, -surfaceDistance, -dimensions.z)));
+				springs[2] = new DistanceJoint(bottom, PxTransform(PxVec3(-dimensions.x, 0.f, dimensions.z)), top, PxTransform(PxVec3(-dimensions.x, -surfaceDistance, dimensions.z)));
+				springs[3] = new DistanceJoint(bottom, PxTransform(PxVec3(-dimensions.x, 0.f, -dimensions.z)), top, PxTransform(PxVec3(-dimensions.x, -surfaceDistance, -dimensions.z)));
 
 				for (unsigned int i = 0; i < springs.size(); i++)
 				{
@@ -40,6 +46,9 @@ namespace PhysicsEngine
 			{
 				scene->Add(bottom);
 				scene->Add(top);
+				
+				for (int i = 0; i < 2; i++)
+					scene->Add(walls[i]);
 			}
 
 			void SetColor(PxVec3 rgb)

@@ -5,7 +5,7 @@ namespace VisualDebugger
 	Camera* camera;
 	PhysicsEngine::MyScene* scene;
 	PxReal delta_time = 1.f / 60.f;
-	PxReal gForceStrength = 20;
+	PxReal gForceStrength = 10;
 	RenderMode render_mode = NORMAL;
 	const int MAX_KEYS = 256;
 	bool key_state[MAX_KEYS];
@@ -142,9 +142,9 @@ namespace VisualDebugger
 
 		switch (toupper(key))
 		{
-			case ',': scene->HitL();
+			case ',': scene->flipperL->InvertDrive();
 				break;
-			case '.': scene->HitR();
+			case '.': scene->flipperR->InvertDrive();
 				break;
 			default:
 				break;
@@ -192,9 +192,9 @@ namespace VisualDebugger
 
 		switch (toupper(key))
 		{
-			case ',': scene->HitL();
+			case ',': scene->flipperL->InvertDrive();
 				break;
-			case '.': scene->HitR();
+			case '.': scene->flipperR->InvertDrive();
 				break;
 			default:
 				break;

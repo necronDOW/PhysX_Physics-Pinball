@@ -87,6 +87,13 @@ namespace PhysicsEngine
 					GetShape(i)->setLocalPose(PxTransform(points[i] + mid, PxQuat(atan2(len.y, len.x), PxVec3(0, 0, 1))));
 				}
 			}
+
+			void SetMaterial(PxMaterial* mat)
+			{
+				std::vector<PxShape*> shapes = GetShapes();
+				for (int i = 0; i < shapes.size(); i++)
+					Material(mat, i);
+			}
 		
 		private:
 			void Split(PxVec3*& arr, int indexA, int indexB, int count, float bendFactor)

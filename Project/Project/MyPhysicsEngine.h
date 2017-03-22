@@ -41,16 +41,17 @@ namespace PhysicsEngine
 	///Custom scene class
 	class MyScene : public Scene
 	{
-		Plane *plane;
-		Platform *platform;
-		Flipper *flipperL;
-		Flipper *flipperR;
-		Sphere *ball;
-		Plunger *plunger;
-		std::vector<CurvedWall*> walls;
-		CustomSimulationCallback *my_callback;
+		private:
+			Plane *plane;
+			Platform *platform;
+			Sphere *ball;
+			Plunger *plunger;
+			CustomSimulationCallback *my_callback;
 		
 		public:
+			Flipper *flipperL;
+			Flipper *flipperR;
+
 			MyScene() : Scene(CustomFilterShader) {};
 
 			void SetVisualisation()
@@ -83,24 +84,19 @@ namespace PhysicsEngine
 				platform->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 				Add(platform);
 
-				ball = new Sphere(platform->RelativeTransform(PxVec2(.7f, -.4f)), .1f, 1.f);
+				ball = new Sphere(platform->RelativeTransform(PxVec2(.875f, -.4f)), .1f, 1.f);
 				ball->Material(MaterialLibrary::Instance().New("steel", 0.25f, 0.f, 0.597f), 0);
 				ball->Color(color_palette[3]);
 				ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 				ball->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 				Add(ball);
 
-				plunger = new Plunger(platform->RelativeTransform(PxVec2(.9f, -.5575f), -0.1f), PxVec3(.2f), .3f, .05f, 300.0f, 1.f);
+				plunger = new Plunger(platform->RelativeTransform(PxVec2(.875f, -.97f)), PxVec3(.05f, .1f, .25f), 2.6f, .125f, 3.0f, 1.5f);
 				plunger->SetColor(color_palette[2]);
 				plunger->AddToScene(this);
 
-				flipperL = new Flipper(this, Mathv::Multiply(platform->RelativeTransform(PxVec2(-.35f, -.725f)), Mathv::EulerToQuat(0, PxHalfPi, PxHalfPi)), .8f, 30.f, -PxPi/4.f, PxPi/4.f);
-				flipperL->SetMaterial(MaterialLibrary::Instance().Get("wood"));
-				flipperL->SetColor(color_palette[2]);
-
-				flipperR = new Flipper(this, Mathv::Multiply(platform->RelativeTransform(PxVec2(.35f, -.725f)), Mathv::EulerToQuat(0, PxHalfPi, -PxHalfPi)), .8f, -30.f, -PxPi/4.f, PxPi/4.f);
-				flipperR->SetMaterial(MaterialLibrary::Instance().Get("wood"));
-				flipperR->SetColor(color_palette[2]);
+				flipperL = AddFlipper(Mathv::Multiply(platform->RelativeTransform(PxVec2(-.35f, -.725f)), Mathv::EulerToQuat(0, PxHalfPi, PxHalfPi)), 30.0f);
+				flipperR = AddFlipper(Mathv::Multiply(platform->RelativeTransform(PxVec2(.35f, -.725f)), Mathv::EulerToQuat(0, PxHalfPi, -PxHalfPi)), -30.0f);
 
 				// Left Walls
 				AddWall(PxVec2(-.4f, -.85f), PxHalfPi, .9f);
@@ -123,20 +119,20 @@ namespace PhysicsEngine
 				
 			}
 
+			Flipper* AddFlipper(const PxTransform& transform, float initDrive, const char* material = "wood", PxVec3 color = color_palette[2])
+			{
+				Flipper* f = new Flipper(this, transform, .8f, initDrive, -PxPi / 4.f, PxPi / 4.f);
+				f->SetMaterial(MaterialLibrary::Instance().Get(material));
+				f->SetColor(color);
+
+				return f;
+			}
+
 			void AddWall(PxVec2 placement, PxReal rotation, float scale = 1.f, int divisions = 0, float bendFactor = 0.f, float height = .25f, float thickness = .05f)
 			{
-				walls.push_back(new CurvedWall(Mathv::Multiply(platform->RelativeTransform(placement), PxQuat(rotation, PxVec3(0, 0, 1))), scale, divisions, bendFactor, height, thickness));
-				Add(walls[walls.size() - 1]);
-			}
-
-			void HitL()
-			{
-				flipperL->InvertDrive();
-			}
-
-			void HitR()
-			{
-				flipperR->InvertDrive();
+				CurvedWall* cw = new CurvedWall(Mathv::Multiply(platform->RelativeTransform(placement), PxQuat(rotation, PxVec3(0, 0, 1))), scale, divisions, bendFactor, height, thickness);
+				cw->SetMaterial(MaterialLibrary::Instance().Get("wood"));
+				Add(cw);
 			}
 	};
 }
