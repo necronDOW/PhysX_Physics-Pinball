@@ -45,10 +45,10 @@ namespace PhysicsEngine
 			Plane *plane;
 			Platform *platform;
 			Sphere *ball;
-			Plunger *plunger;
 			CustomSimulationCallback *my_callback;
 		
 		public:
+			Plunger *plunger;
 			Flipper *flipperL;
 			Flipper *flipperR;
 
@@ -84,14 +84,14 @@ namespace PhysicsEngine
 				platform->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 				Add(platform);
 
-				ball = new Sphere(platform->RelativeTransform(PxVec2(.875f, -.4f)), .1f, 1.f);
+				ball = new Sphere(platform->RelativeTransform(PxVec2(.9475f, -.4f)), .09f, 1.f);
 				ball->Material(MaterialLibrary::Instance().New("steel", 0.25f, 0.f, 0.597f), 0);
 				ball->Color(color_palette[3]);
 				ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 				ball->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 				Add(ball);
 
-				plunger = new Plunger(platform->RelativeTransform(PxVec2(.875f, -.97f)), PxVec3(.05f, .1f, .25f), 2.6f, .125f, 3.0f, 1.5f);
+				plunger = new Plunger(platform->RelativeTransform(PxVec2(.9475f, -.9825f)), PxVec3(.1f, .1f, .25f), 1.545f, .05f, 12.f, .5f);
 				plunger->SetColor(color_palette[2]);
 				plunger->AddToScene(this);
 
@@ -101,14 +101,14 @@ namespace PhysicsEngine
 				// Left Walls
 				AddWall(PxVec2(-.4f, -.85f), PxHalfPi, .9f);
 				AddWall(PxVec2(-.675f, -.55f), -PxQuartPi, 1.325f);
-				AddWall(PxVec2(-.75f, -0.1f), PxPi + PxQuartPi, 1.f, 3, .15f);
+				AddWall(PxVec2(-.755f, -0.1525f), -PxQuartPi * 2.75f, 1.25f, 3, .125f);
 				AddWall(PxVec2(-.5f, .725f), PxPi + PxQuartPi, 2.f, 4, .225f);
 				AddWall(PxVec2(-.755f, .2125f), -PxQuartPi*1.25f, 1.25f, 3, .15f);
 
 				// Right Walls
 				AddWall(PxVec2(.4f, -.85f), PxHalfPi, .9f);
-				AddWall(PxVec2(.5625f, -.605f), PxQuartPi, .875f);
-				AddWall(PxVec2(.75f, -0.1f), PxHalfPi + PxQuartPi, 1.f, 3, .15f);
+				AddWall(PxVec2(.62f, -.5775f), PxQuartPi, 1.12f);
+				AddWall(PxVec2(.755f, -0.1525f), PxQuartPi * 2.75f, 1.25f, 3, .125f);
 				AddWall(PxVec2(.5f, .725f), PxHalfPi + PxQuartPi, 2.f, 4, .225f);
 				AddWall(PxVec2(.755f, .2125f), PxQuartPi*1.25f, 1.25f, 3, .15f);
 				AddWall(PxVec2(.45f, .475f), PxHalfPi, 1.5f, 4, .25f);

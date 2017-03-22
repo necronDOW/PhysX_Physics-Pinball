@@ -161,6 +161,9 @@ namespace VisualDebugger
 				ForceInput(i);
 			}
 		}
+
+		if (key_state[int('p')])
+			scene->plunger->Pull();
 	}
 
 	void KeySpecial(int key, int x, int y)
@@ -195,6 +198,8 @@ namespace VisualDebugger
 			case ',': scene->flipperL->InvertDrive();
 				break;
 			case '.': scene->flipperR->InvertDrive();
+				break;
+			case 'P': scene->plunger->Release();
 				break;
 			default:
 				break;
