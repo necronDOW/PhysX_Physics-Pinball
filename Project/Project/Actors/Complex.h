@@ -65,17 +65,59 @@ namespace PhysicsEngine
 			}
 	};
 
+	class CurvedWall : public StaticActor
+	{
+		public:
+			CurvedWall(const PxTransform& pose = PxTransform(PxIdentity), float scale = 1.f, int divisions = 0, float bendFactor = .1f, float height = .1f, float thickness = .05f)
+				: StaticActor(pose)
+			{
+				int size = pow(2, divisions) + 1;
+				PxVec3* points = new PxVec3[size];
+				points[0] = PxVec3(-1, 0, 0) * scale;
+				points[size-1] = PxVec3(1, 0, 0) * scale;
+
+				Split(points, 0, size - 1, divisions, PxClamp(bendFactor, .0f, .4f));
+
+				for (int i = 0; i < size - 1; i++)
+				{
+					PxVec3 len = points[i + 1] - points[i];
+					PxVec3 mid = len / 2.f;
+
+					CreateShape(PxBoxGeometry(PxVec3(mid.magnitude(), thickness, height)), 1.f);
+					GetShape(i)->setLocalPose(PxTransform(points[i] + mid, PxQuat(atan2(len.y, len.x), PxVec3(0, 0, 1))));
+				}
+			}
+		
+		private:
+			void Split(PxVec3*& arr, int indexA, int indexB, int count, float bendFactor)
+			{
+				if (count != 0)
+				{
+					PxVec3 len = arr[indexB] - arr[indexA];
+					PxVec3 mid = arr[indexA] + (len / 2.f);
+
+					int indexNP = (indexA + indexB) / 2;
+					arr[indexNP] = mid + len.cross(PxVec3(0, 0, 1)) * bendFactor;
+
+					bendFactor /= 2.f;
+					Split(arr, indexA, indexNP, --count, bendFactor);
+					Split(arr, indexNP, indexB, count, bendFactor);
+				}
+			}
+	};
+
 	class Polygon : public StaticActor
 	{
 		protected:
 			PxTransform _transform;
 			std::vector<PxVec3> _corners;
-			PxVec3 _center;
 
 		public:
-			Polygon(PxVec3 pos = PxVec3(0), PxVec3 rot = PxVec3(0), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
-				: StaticActor(_transform = PxTransform(pos, Mathv::EulerToQuat(rot.x, rot.y, rot.z)))
+			Polygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
+				: StaticActor(pose)
 			{
+				_transform = pose;
+
 				float angleVarience = (PxPi * 2.f) / (float)edgeCount;
 				float angle = (edgeCount % 2 != 0) ? angleVarience : angleVarience / 2.f;
 
@@ -90,11 +132,6 @@ namespace PhysicsEngine
 					CreateShape(PxBoxGeometry(PxVec3(edgeLength, thickness, thickness * scale.z)), 1.f);
 					GetShape(i)->setLocalPose(PxTransform(_corners[i] + (len / 2.f), PxQuat(atan2(len.y, len.x), PxVec3(0, 0, 1))));
 				}
-
-				_center = PxVec3(0);
-				for (int i = 0; i < _corners.size(); i++)
-					_center += _corners[i];
-				_center = _transform.p + (_center / _corners.size());
 			}
 
 			void Materials(PxMaterial* material)
@@ -110,8 +147,6 @@ namespace PhysicsEngine
 				for (int i = 0; i < _corners.size(); i++)
 					Color(rgb, i);
 			}
-
-			PxVec3 center() { return _center; }
 
 		private:
 			float Edge(float radius, float angleVarience)
@@ -133,8 +168,8 @@ namespace PhysicsEngine
 				Transparent
 			};
 
-			CappedPolygon(PxVec3 pos = PxVec3(0), PxVec3 rot = PxVec3(0), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1), CapMode top = None, CapMode bottom = None)
-				: Polygon(pos, rot, edgeCount, thickness, scale)
+			CappedPolygon(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1), CapMode top = None, CapMode bottom = None)
+				: Polygon(pose, edgeCount, thickness, scale)
 			{
 				Cap(top, thickness * scale.z + thickness, edgeCount, thickness);
 				Cap(bottom, -thickness * scale.z - thickness, edgeCount + 1, thickness);
@@ -180,17 +215,18 @@ namespace PhysicsEngine
 			PxVec3 _halfExtents;
 
 		public:
-			Platform(PxVec3 pos = PxVec3(0), PxVec3 rot = PxVec3(0), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
-				: CappedPolygon(pos, rot, edgeCount, thickness, scale, CapMode::Transparent, CapMode::Opaque)
+			Platform(const PxTransform& pose = PxTransform(PxIdentity), int edgeCount = 4, float thickness = .1f, PxVec3 scale = PxVec3(1))
+				: CappedPolygon(pose, edgeCount, thickness, scale, CapMode::Transparent, CapMode::Opaque)
 			{
-				PxReal rad = _transform.q.getAngle();
 				_halfExtents = _corners[0].abs();
 			}
-			
-			PxTransform RelativeTransform(PxVec3 offset)
+
+			PxTransform RelativeTransform(PxVec2 offset, float yOffset = 0.f)
 			{
 				PxVec3 halfExtents2D = PxVec3(_halfExtents.x, _halfExtents.y, 1.f);
-				return PxTransform(_center + Mathv::Multiply(_transform.q, offset.multiply(halfExtents2D)), _transform.q);
+				PxVec3 offsetV3 = PxVec3(offset.x, offset.y, yOffset);
+
+				return PxTransform(_transform.p + Mathv::Multiply(_transform.q, offsetV3.multiply(halfExtents2D)), _transform.q);
 			}
 	};
 

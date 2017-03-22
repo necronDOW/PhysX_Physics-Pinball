@@ -64,7 +64,7 @@ namespace PhysicsEngine
 		public:
 			Flipper(Scene* scene, PxTransform pose, float scale = 1.f, float drive = 0.f, float lowerBounds = 0.f, float upperBounds = (PxPi * 2.f))
 			{
-				wedge = new Wedge(PxTransform(PxVec3(1), PxQuat(PxHalfPi, PxVec3(0, 0, 1.f))), 1.f, PxVec3(.5f, 1.f, .25f) * scale);
+				wedge = new Wedge(PxTransform(PxIdentity), 1.f, PxVec3(.5f, 1.f, .25f) * scale);
 				scene->Add(wedge);
 
 				joint = new RevoluteJoint(nullptr, pose, wedge, PxTransform(PxVec3(0)));

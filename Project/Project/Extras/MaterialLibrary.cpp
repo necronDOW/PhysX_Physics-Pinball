@@ -19,7 +19,7 @@ PxMaterial* MaterialLibrary::New(string id, float sf, float df, float cr)
 	}
 
 	PxMaterial* check = Get(id);
-	if (check != nullptr)
+	if (check)
 		return check;
 
 	std::cout << "Material (id=" << id << ", sf=" << sf << ", df=" << df << ", cr=" << cr << ") added." << std::endl;
