@@ -107,6 +107,8 @@ namespace PhysicsEngine
 
 		virtual void CustomUpdate() {}
 
+		virtual void PostUpdate() {}
+
 		void Add(Actor* actor);
 
 		PxScene* Get();

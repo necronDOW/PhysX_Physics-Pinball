@@ -84,6 +84,31 @@ namespace PhysicsEngine
 				((PxRevoluteJoint*)joint)->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
 			}
 	};
+
+	class SphericalJoint : public Joint
+	{
+		private:
+			Actor* pivot;
+			Actor* actor;
+
+		public:
+			SphericalJoint(Actor* actor0, const PxTransform& localFrame0, Actor* actor1, const PxTransform& localFrame1)
+			{
+				PxRigidActor* px_actor0 = 0;
+				if (actor0)
+					px_actor0 = (PxRigidActor*)actor0->Get();
+				else actor1->Get()->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+
+				joint = PxSphericalJointCreate(*GetPhysics(), px_actor0, localFrame0, (PxRigidActor*)actor1->Get(), localFrame1);
+				joint->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true);
+			}
+
+			void SetLimits(PxReal yLimit, PxReal zLimit)
+			{
+				((PxSphericalJoint*)joint)->setLimitCone(PxJointLimitCone(yLimit, zLimit, 0.01f));
+				((PxSphericalJoint*)joint)->setSphericalJointFlag(PxSphericalJointFlag::eLIMIT_ENABLED, true);
+			}
+	};
 }
 
 #endif

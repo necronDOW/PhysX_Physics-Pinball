@@ -259,6 +259,8 @@ namespace PhysicsEngine
 
 		px_scene->simulate(dt);
 		px_scene->fetchResults(true);
+
+		PostUpdate();
 	}
 
 	void Scene::Add(Actor* actor)

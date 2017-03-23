@@ -1,6 +1,8 @@
 #ifndef game_h
 #define game_h
 
+#include "PxPhysicsAPI.h"
+
 class Game
 {
 	private:
@@ -11,9 +13,14 @@ class Game
 		~Game() { }
 		/// SINGLETON
 
+		int _multiplier = 1;
+		int _streak = 0;
 		int _score = 0;
 		int _lives = 5;
 		bool _gameOver = false;
+		bool _resetNextUpdate = false;
+		physx::PxRigidActor* _player;
+		physx::PxTransform _initialPlayerPosition;
 
 		void CheckState();
 
@@ -31,6 +38,10 @@ class Game
 		void score(int modifier);
 		void lives(int modifier);
 		bool gameover();
+		void player(physx::PxActor* player);
+		void Reset();
+		void ResetPlayer();
+		void Update();
 };
 
 #endif

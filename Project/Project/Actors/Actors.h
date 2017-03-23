@@ -7,6 +7,7 @@
 #include "Complex.h"
 #include "Primitive.h"
 #include "../Extras/Helper.h"
+#include "../Extras/Triggers.h"
 
 namespace PhysicsEngine
 {
@@ -88,12 +89,12 @@ namespace PhysicsEngine
 			RevoluteJoint* joint;
 
 		public:
-			Flipper(Scene* scene, PxTransform pose, float scale = 1.f, float drive = 0.f, float lowerBounds = 0.f, float upperBounds = (PxPi * 2.f))
+			Flipper(Scene* scene, const PxTransform& pose = PxTransform(PxIdentity), float scale = 1.f, float drive = 0.f, float lowerBounds = 0.f, float upperBounds = (PxPi * 2.f))
 			{
 				wedge = new Wedge(PxTransform(PxIdentity), 1.f, PxVec3(.5f, 1.f, .25f) * scale);
 				scene->Add(wedge);
 
-				joint = new RevoluteJoint(nullptr, pose, wedge, PxTransform(PxVec3(0)));
+				joint = new RevoluteJoint(nullptr, pose, wedge, PxTransform(PxVec3(PxIdentity)));
 				joint->driveVelocity(drive);
 				joint->SetLimits(lowerBounds, upperBounds);
 			}
@@ -120,7 +121,36 @@ namespace PhysicsEngine
 			Pinball(const PxTransform& pose = PxTransform(PxIdentity), PxReal radius = 1.f, PxReal density = 1.f)
 				: Sphere(pose, radius, density)
 			{
+				Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+				SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
+			}
+	};
 
+	class Hitpoint
+	{
+		private:
+			SphericalJoint* _joint;
+			Capsule* _body;
+
+		public:
+			Hitpoint(Scene* scene, const PxTransform& pose = PxTransform(PxIdentity), PxVec2 scale = PxVec2(0.f), float density = 1.f)
+			{
+				_body = new Capsule(pose, scale, density);
+				scene->Add(_body);
+
+				PxVec3 bodyP = Mathv::Multiply(pose.q, PxVec3(0.f, 0.f, scale.x+scale.y));
+				_joint = new SphericalJoint(nullptr, pose, _body, PxTransform(bodyP));
+				_joint->SetLimits(PxPi/8, PxPi/8);
+			}
+
+			void SetMaterial(PxMaterial* material)
+			{
+				_body->Material(material, 0);
+			}
+
+			Actor* Get()
+			{
+				return _body;
 			}
 	};
 }
