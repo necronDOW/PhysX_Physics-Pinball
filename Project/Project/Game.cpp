@@ -16,6 +16,7 @@ int Game::score()
 void Game::score(int modifier)
 {
 	_score += modifier * _multiplier;
+	_hud->EditLine(VisualDebugger::SCORE, 3, _score);
 
 	if (++_streak == 5)
 		_multiplier++;
@@ -24,6 +25,8 @@ void Game::score(int modifier)
 void Game::lives(int modifier)
 {
 	_lives += modifier;
+	_hud->EditLine(VisualDebugger::SCORE, 1, _lives);
+
 	CheckState();
 }
 
@@ -43,6 +46,14 @@ void Game::player(physx::PxActor* player)
 	}
 }
 
+void Game::hud(VisualDebugger::HUD* hud)
+{
+	_hud = hud;
+
+	_hud->EditLine(VisualDebugger::SCORE, 1, _lives);
+	_hud->EditLine(VisualDebugger::SCORE, 3, _score);
+}
+
 void Game::Reset()
 {
 	_multiplier = 1;
@@ -50,6 +61,9 @@ void Game::Reset()
 	_score = 0;
 	_lives = 5;
 	_gameOver = false;
+
+	_hud->EditLine(VisualDebugger::SCORE, 1, _lives);
+	_hud->EditLine(VisualDebugger::SCORE, 3, _score);
 
 	ResetPlayer();
 }
@@ -61,6 +75,9 @@ void Game::ResetPlayer()
 
 void Game::Update()
 {
+	if (_gameOver)
+		Reset();
+
 	if (_resetNextUpdate && _initialPlayerPosition.isValid())
 	{
 		_player->setGlobalPose(_initialPlayerPosition);

@@ -2,6 +2,7 @@
 #define game_h
 
 #include "PxPhysicsAPI.h"
+#include "Extras/HUD.h"
 
 class Game
 {
@@ -21,6 +22,7 @@ class Game
 		bool _resetNextUpdate = false;
 		physx::PxRigidActor* _player;
 		physx::PxTransform _initialPlayerPosition;
+		VisualDebugger::HUD* _hud;
 
 		void CheckState();
 
@@ -39,6 +41,7 @@ class Game
 		void lives(int modifier);
 		bool gameover();
 		void player(physx::PxActor* player);
+		void hud(VisualDebugger::HUD* hud);
 		void Reset();
 		void ResetPlayer();
 		void Update();

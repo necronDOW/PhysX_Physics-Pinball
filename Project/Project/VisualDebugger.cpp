@@ -41,11 +41,14 @@ namespace VisualDebugger
 	void HUDInit()
 	{
 		hud.AddLine(EMPTY, "");
+		AddHUD(SCORE, "../Assets/score_hud.txt", true);
 		AddHUD(HELP, "../Assets/help_hud.txt");
 		AddHUD(PAUSE, "../Assets/paused_hud.txt");
 
 		hud.FontSize(0.018f);
 		hud.Color(PxVec3(0.f,0.f,0.f));
+
+		Game::Instance().hud(&hud);
 	}
 
 	void Start()
@@ -74,7 +77,7 @@ namespace VisualDebugger
 			if (scene->Pause())
 				hud.ActiveScreen(PAUSE);
 			else
-				hud.ActiveScreen(HELP);
+				hud.ActiveScreen(SCORE);
 		}
 		else hud.ActiveScreen(EMPTY);
 
@@ -242,7 +245,7 @@ namespace VisualDebugger
 			render_mode = NORMAL;
 	}
 
-	void AddHUD(int screen_id, std::string directory)
+	void AddHUD(int screen_id, std::string directory, bool smartScreen)
 	{
 		std::ifstream txt(directory);
 		if (txt.is_open())
@@ -251,7 +254,7 @@ namespace VisualDebugger
 			while (txt.good())
 			{
 				std::getline(txt, buf);
-				hud.AddLine(screen_id, buf);
+				hud.AddLine(screen_id, buf, smartScreen);
 			}
 			txt.close();
 		}

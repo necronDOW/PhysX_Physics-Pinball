@@ -47,7 +47,6 @@ void CustomSimulationCallback::event_ContactFound(PxShape* const* shapes, const 
 			case FilterGroup::ACTOR1:
 				// ... a hitpoint.
 				Game::Instance().score(100);
-				Game::Instance().ResetPlayer();
 				break;
 			case FilterGroup::ACTOR2:
 				// ... a score zone.

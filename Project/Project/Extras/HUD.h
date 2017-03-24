@@ -1,17 +1,30 @@
 #ifndef hud_h
 #define hud_h
 
-#include "Renderer.h"
 #include <string>
 #include <list>
+#include <vector>
+
+#include "PxPhysicsAPI.h"
+#include "Renderer.h"
 
 namespace VisualDebugger
 {
 	using namespace std;
+	using namespace physx;
+
+	enum HUDState
+	{
+		EMPTY = 0,
+		SCORE = 1,
+		HELP = 2,
+		PAUSE = 3
+	};
 
 	class HUDScreen
 	{
-		vector<string> content;
+		protected:
+			vector<string> content;
 
 		public:
 			int id;
@@ -23,16 +36,10 @@ namespace VisualDebugger
 			{
 			}
 
-			int AddLine(string line)
+			virtual int AddLine(string line)
 			{
 				content.push_back(line);
 				return content.size() - 1;
-			}
-
-			void EditLine(int lineNumber, string newText)
-			{
-				if (lineNumber >= 0 && lineNumber < content.size())
-					content[lineNumber] = newText;
 			}
 
 			void Render()
@@ -46,11 +53,68 @@ namespace VisualDebugger
 				content.clear();
 			}
 	};
+	class HUDScreen_Extended : public HUDScreen
+	{
+		private:
+			struct ValueField
+			{
+				int lineNumber;
+				int charIndex;
+				string originalStr;
+
+				ValueField(int _lineNumber, int _charIndex, string _originalStr)
+					: lineNumber(_lineNumber), charIndex(_charIndex), originalStr(_originalStr) { }
+			};
+
+			std::vector<ValueField> fields;
+
+			void EditField(int lineNumber, string input)
+			{
+				for (int i = 0; i < fields.size(); i++)
+				{
+					if (lineNumber == fields[i].lineNumber)
+					{
+						string oStr = fields[i].originalStr;
+						int cI = fields[i].charIndex;
+
+						string front = oStr.substr(0, cI);
+						string end = oStr.substr(cI + 1, oStr.length() - cI);
+
+						content[lineNumber] = front + input + end;
+					}
+				}
+			}
+
+		public:
+			HUDScreen_Extended(int screen_id, const PxVec3& _color = PxVec3(1.f, 1.f, 1.f), const PxReal& _font_size = 0.024f)
+				: HUDScreen(screen_id, _color, _font_size)
+			{
+
+			}
+
+			int AddLine(string line) override
+			{
+				for (int i = 0; i < line.length(); i++)
+				{
+					if (line[i] == '$')
+					{
+						fields.push_back(ValueField(content.size(), i, line));
+						line[i] = '0';
+					}
+				}
+
+				return HUDScreen::AddLine(line);
+			}
+
+			void EditField(int lineNumber, int value) { EditField(lineNumber, to_string(value)); }
+			void EditField(int lineNumber, float value) { EditField(lineNumber, to_string(value)); }
+	};
 
 	class HUD
 	{
-		int active_screen;
-		vector<HUDScreen*> screens;
+		private:
+			int active_screen;
+			vector<HUDScreen*> screens;
 
 		public:
 			~HUD()
@@ -59,7 +123,7 @@ namespace VisualDebugger
 					delete screens[i];
 			}
 
-			void AddLine(int screen_id, string line)
+			void AddLine(int screen_id, string line, bool smartScreen = false)
 			{
 				int screenIndex = FindScreen(screen_id);
 				if (screenIndex != -1)
@@ -68,15 +132,17 @@ namespace VisualDebugger
 					return;
 				}
 
-				screens.push_back(new HUDScreen(screen_id));
+				if (smartScreen)
+					screens.push_back(new HUDScreen_Extended(screen_id));
+				else screens.push_back(new HUDScreen(screen_id));
+
 				screens.back()->AddLine(line);
 			}
 
-			void EditLine(int screen_id, int lineNumber, string line)
+			void EditLine(int screen_id, int lineNumber, int value)
 			{
-				int screenIndex = FindScreen(screen_id);
-				if (screenIndex != -1)
-					screens[screenIndex]->EditLine(lineNumber, line);
+				if (typeid(*screens[screen_id]) == typeid(HUDScreen_Extended));
+					((HUDScreen_Extended*)screens[screen_id])->EditField(lineNumber, value);
 			}
 
 			int FindScreen(int screen_id)

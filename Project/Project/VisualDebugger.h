@@ -19,13 +19,6 @@ namespace VisualDebugger
 		BOTH
 	};
 
-	enum HUDState
-	{
-		EMPTY = 0,
-		HELP = 1,
-		PAUSE = 2
-	};
-
 	void Init(const char *window_name, int width=512, int height=512);
 	void HUDInit();
 
@@ -43,7 +36,7 @@ namespace VisualDebugger
 
 	void ToggleRenderMode();
 
-	void AddHUD(int screen_id, std::string directory);
+	void AddHUD(int screen_id, std::string directory, bool smartScreen = false);
 }
 
 #endif
