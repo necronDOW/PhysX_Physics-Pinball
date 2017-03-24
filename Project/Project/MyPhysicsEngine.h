@@ -160,7 +160,7 @@ namespace PhysicsEngine
 			Hitpoint* AddHitpoint(PxVec2 placement, PxReal rotation, PxVec2 scale, PxVec3 color = color_palette[4])
 			{
 				Hitpoint* hp = new Hitpoint(this, Mathv::Multiply(platform->RelativeTransform(placement, -.15f), PxQuat(rotation, PxVec3(0, 1, 0))), scale, .1f);
-				hp->SetMaterial(MaterialLibrary::Instance().Get("wood"));
+				hp->SetMaterial(MaterialLibrary::Instance().New("glass", 0.475f, 0.f, .69f));
 				hp->Get()->SetupFiltering(FilterGroup::HITPOINT, FilterGroup::PLAYER);
 				hp->Get()->Color(color);
 

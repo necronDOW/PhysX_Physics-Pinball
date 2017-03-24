@@ -93,7 +93,7 @@ namespace PhysicsEngine
 				PxRigidActor* px_actor0 = 0;
 				if (actor0)
 					px_actor0 = (PxRigidActor*)actor0->Get();
-				else actor1->Get()->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+				//else actor1->Get()->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 
 				joint = PxSphericalJointCreate(*GetPhysics(), px_actor0, localFrame0, (PxRigidActor*)actor1->Get(), localFrame1);
 				joint->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true);
