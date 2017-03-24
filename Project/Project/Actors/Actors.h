@@ -91,10 +91,12 @@ namespace PhysicsEngine
 		public:
 			Flipper(Scene* scene, const PxTransform& pose = PxTransform(PxIdentity), float scale = 1.f, float drive = 0.f, float lowerBounds = 0.f, float upperBounds = (PxPi * 2.f))
 			{
-				wedge = new Wedge(PxTransform(PxIdentity), 1.f, PxVec3(.25f, 1.f, .25f) * scale);
+				PxVec3 wedgeDimensions = PxVec3(.5f, 1.f, .3f);
+				wedge = new Wedge(PxTransform(pose.p + Mathv::Multiply(pose.q, PxVec3(0.f, wedgeDimensions.z / 2.f, 0.f)), pose.q), 1.f, wedgeDimensions * scale);
+				wedge->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 				scene->Add(wedge);
 
-				joint = new RevoluteJoint(nullptr, pose, wedge, PxTransform(PxVec3(0.f, .125f, 0.f)));
+				joint = new RevoluteJoint(nullptr, pose, wedge, PxTransform(PxVec3(0.f, wedgeDimensions.z / 2.f, 0.f)));
 				joint->driveVelocity(drive);
 				joint->SetLimits(lowerBounds, upperBounds);
 			}
@@ -156,18 +158,24 @@ namespace PhysicsEngine
 
 	class TriggerZone : public BoxStatic
 	{
-		void *_callback;
+		private:
+			bool visible = false;
 
 		public:
 			TriggerZone(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, .5f, .5f), int filterGroup = -1)
 				: BoxStatic(pose, dimensions)
 			{
 				PxShape* shape = GetShape();
-				shape->setFlag(PxShapeFlag::eVISUALIZATION, false);
+				shape->setFlag(PxShapeFlag::eVISUALIZATION, visible);
 				shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 				shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
 
 				SetupFiltering(filterGroup, FilterGroup::PLAYER);
+			}
+
+			void ToggleVisible()
+			{
+				GetShape()->setFlag(PxShapeFlag::eVISUALIZATION, visible = !visible);
 			}
 	};
 }

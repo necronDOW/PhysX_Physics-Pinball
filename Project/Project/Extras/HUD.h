@@ -239,6 +239,15 @@ namespace VisualDebugger
 					}
 				}
 			}
+
+			int NextScreen()
+			{
+				int next = (active_screen == screens.size()) ? 0 : active_screen + 1;
+
+				if (next == PAUSE)
+					return (++next == screens.size()) ? 0 : next;
+				else return next;
+			}
 		};
 }
 

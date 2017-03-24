@@ -29,6 +29,7 @@ void SimulationCallback::onContact(const PxContactPairHeader &pairHeader, const 
 
 void CustomSimulationCallback::event_TriggerFound(PxShape* shape, PxShape* trigger)
 {
+	// If the player (PLAYER) hits ...
 	if (shape->getSimulationFilterData().word0 == FilterGroup::PLAYER)
 	{
 		switch (trigger->getSimulationFilterData().word0)
@@ -54,7 +55,7 @@ void CustomSimulationCallback::event_TriggerLost(PxShape* shape, PxShape* trigge
 
 void CustomSimulationCallback::event_ContactFound(PxShape* const* shapes, const int size)
 {
-	// If the player (ACTOR0) hits ...
+	// If the player (PLAYER) hits ...
 	if (shapes[1]->getSimulationFilterData().word0 == FilterGroup::PLAYER)
 	{
 		switch (shapes[0]->getSimulationFilterData().word0)

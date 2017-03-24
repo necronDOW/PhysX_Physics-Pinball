@@ -11,6 +11,8 @@ namespace VisualDebugger
 	bool key_state[MAX_KEYS];
 	bool hud_show = true;
 	HUD hud;
+	int activeScreen = SCORE;
+
 
 	void Init(const char *window_name, int width, int height)
 	{
@@ -77,7 +79,7 @@ namespace VisualDebugger
 			if (scene->Pause())
 				hud.ActiveScreen(PAUSE);
 			else
-				hud.ActiveScreen(SCORE);
+				hud.ActiveScreen(activeScreen);
 		}
 		else hud.ActiveScreen(EMPTY);
 
@@ -173,7 +175,13 @@ namespace VisualDebugger
 	{
 		switch (key)
 		{
-			case GLUT_KEY_F5: hud_show = !hud_show;
+			case GLUT_KEY_F3:
+				if (hud_show)
+					activeScreen = hud.NextScreen();
+				break;
+			case GLUT_KEY_F4: hud_show = !hud_show;
+				break;
+			case GLUT_KEY_F5: scene->ToggleTriggersVisible();
 				break;
 			case GLUT_KEY_F6: Renderer::ShowShadows(!Renderer::ShowShadows());
 				break;

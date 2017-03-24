@@ -1,10 +1,13 @@
+
  Simulation
     F9 - select next actor
     F10 - pause
     F12 - reset
 
  Display
-    F5 - help on/off
+    F3 - switch hud
+    F4 - hud on/off
+    F5 - triggers on/off
     F6 - shadows on/off
     F7 - render mode
 
