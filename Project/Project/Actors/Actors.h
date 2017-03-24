@@ -91,10 +91,10 @@ namespace PhysicsEngine
 		public:
 			Flipper(Scene* scene, const PxTransform& pose = PxTransform(PxIdentity), float scale = 1.f, float drive = 0.f, float lowerBounds = 0.f, float upperBounds = (PxPi * 2.f))
 			{
-				wedge = new Wedge(PxTransform(PxIdentity), 1.f, PxVec3(.5f, 1.f, .25f) * scale);
+				wedge = new Wedge(PxTransform(PxIdentity), 1.f, PxVec3(.25f, 1.f, .25f) * scale);
 				scene->Add(wedge);
 
-				joint = new RevoluteJoint(nullptr, pose, wedge, PxTransform(PxVec3(PxIdentity)));
+				joint = new RevoluteJoint(nullptr, pose, wedge, PxTransform(PxVec3(0.f, .125f, 0.f)));
 				joint->driveVelocity(drive);
 				joint->SetLimits(lowerBounds, upperBounds);
 			}
@@ -122,7 +122,7 @@ namespace PhysicsEngine
 				: Sphere(pose, radius, density)
 			{
 				Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
-				SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
+				SetupFiltering(FilterGroup::PLAYER, FilterGroup::HITPOINT);
 			}
 	};
 
@@ -151,6 +151,23 @@ namespace PhysicsEngine
 			Actor* Get()
 			{
 				return _body;
+			}
+	};
+
+	class TriggerZone : public BoxStatic
+	{
+		void *_callback;
+
+		public:
+			TriggerZone(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, .5f, .5f), int filterGroup = -1)
+				: BoxStatic(pose, dimensions)
+			{
+				PxShape* shape = GetShape();
+				shape->setFlag(PxShapeFlag::eVISUALIZATION, false);
+				shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+				shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+
+				SetupFiltering(filterGroup, FilterGroup::PLAYER);
 			}
 	};
 }

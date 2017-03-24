@@ -18,7 +18,7 @@ void Game::score(int modifier)
 	_score += modifier * _multiplier;
 	_hud->EditLine(VisualDebugger::SCORE, 3, _score);
 
-	if (++_streak == 5)
+	if (++_streak % 5 == 0)
 		_multiplier++;
 }
 
@@ -27,6 +27,7 @@ void Game::lives(int modifier)
 	_lives += modifier;
 	_hud->EditLine(VisualDebugger::SCORE, 1, _lives);
 
+	ResetPlayer();
 	CheckState();
 }
 

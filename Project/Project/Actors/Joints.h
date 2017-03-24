@@ -87,10 +87,6 @@ namespace PhysicsEngine
 
 	class SphericalJoint : public Joint
 	{
-		private:
-			Actor* pivot;
-			Actor* actor;
-
 		public:
 			SphericalJoint(Actor* actor0, const PxTransform& localFrame0, Actor* actor1, const PxTransform& localFrame1)
 			{

@@ -12,7 +12,7 @@ namespace PhysicsEngine
 	using namespace std;
 
 	static const PxReal PxQuartPi = PxHalfPi / 2.f;
-	static const PxVec3 color_palette[] = { PxVec3(1.f), PxVec3(.2f), PxVec3(1.f,.3f,.3f), PxVec3(.3f,.3f,1.f) };
+	static const PxVec3 color_palette[] = { PxVec3(1.f), PxVec3(.2f), PxVec3(1.f,.3f,.3f), PxVec3(.3f,.3f,1.f), PxVec3(1.f,.65f,.3f) };
 
 	static PxFilterFlags CustomFilterShader( PxFilterObjectAttributes attributes0,	PxFilterData filterData0,
 		PxFilterObjectAttributes attributes1,	PxFilterData filterData1,
@@ -110,8 +110,8 @@ namespace PhysicsEngine
 				plunger->SetColor(color_palette[2]);
 				plunger->AddToScene(this);
 
-				flipperL = AddFlipper(Mathv::Multiply(platform->RelativeTransform(PxVec2(-.35f, -.725f)), Mathv::EulerToQuat(0, PxHalfPi, PxHalfPi)), 30.0f);
-				flipperR = AddFlipper(Mathv::Multiply(platform->RelativeTransform(PxVec2(.35f, -.725f)), Mathv::EulerToQuat(0, PxHalfPi, -PxHalfPi)), -30.0f);
+				flipperL = AddFlipper(Mathv::Multiply(platform->RelativeTransform(PxVec2(-.3f, -.75f)), Mathv::EulerToQuat(0, PxHalfPi, PxHalfPi)), 30.0f);
+				flipperR = AddFlipper(Mathv::Multiply(platform->RelativeTransform(PxVec2(.3f, -.75f)), Mathv::EulerToQuat(0, PxHalfPi, -PxHalfPi)), -30.0f);
 
 				// WALLS
 				// Left Walls
@@ -141,6 +141,11 @@ namespace PhysicsEngine
 				// Lower
 				AddHitpoint(PxVec2(-.4f, -.3f), -PxHalfPi, PxVec2(.2f, .02f));
 				AddHitpoint(PxVec2(.4f, -.3f), -PxHalfPi, PxVec2(.2f, .02f));
+
+				// TRIGGER ZONES
+				AddTrigger(PxVec2(0.f, -1.1f), 0.f, 1.1f, FilterGroup::KILLZONE);
+				AddTrigger(PxVec2(.65f, .135f), .2f, .5f, FilterGroup::SCOREZONE);
+				AddTrigger(PxVec2(.65f, .81f), -.2f, .5f, FilterGroup::SCOREZONE);
 			}
 
 			Flipper* AddFlipper(const PxTransform& transform, float initDrive, const char* material = "wood", PxVec3 color = color_palette[2])
@@ -152,11 +157,12 @@ namespace PhysicsEngine
 				return f;
 			}
 
-			Hitpoint* AddHitpoint(PxVec2 placement, PxReal rotation, PxVec2 scale)
+			Hitpoint* AddHitpoint(PxVec2 placement, PxReal rotation, PxVec2 scale, PxVec3 color = color_palette[4])
 			{
 				Hitpoint* hp = new Hitpoint(this, Mathv::Multiply(platform->RelativeTransform(placement, -.15f), PxQuat(rotation, PxVec3(0, 1, 0))), scale, .1f);
 				hp->SetMaterial(MaterialLibrary::Instance().Get("wood"));
-				hp->Get()->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
+				hp->Get()->SetupFiltering(FilterGroup::HITPOINT, FilterGroup::PLAYER);
+				hp->Get()->Color(color);
 
 				return hp;
 			}
@@ -166,6 +172,12 @@ namespace PhysicsEngine
 				CurvedWall* cw = new CurvedWall(Mathv::Multiply(platform->RelativeTransform(placement), PxQuat(rotation, PxVec3(0, 0, 1))), scale, divisions, bendFactor, height, thickness);
 				cw->SetMaterial(MaterialLibrary::Instance().Get("wood"));
 				Add(cw);
+			}
+
+			void AddTrigger(PxVec2 placement, PxReal rotation, PxReal scale, int filterGroup)
+			{
+				TriggerZone* trigger = new TriggerZone(Mathv::Multiply(platform->RelativeTransform(placement), PxQuat(rotation, PxVec3(0, 0, 1))), PxVec3(scale), filterGroup);
+				Add(trigger);
 			}
 	};
 }
