@@ -2,6 +2,7 @@
 
 PxQuat Mathv::EulerToQuat(float x, float y, float z)
 {
+	// Very basic trigonometry to calculate a PxQuat from a provided set of X, Y, and Z values (euler angles).
 	float c1 = cos(y / 2);
 	float s1 = sin(y / 2);
 	float c2 = cos(x / 2);
@@ -14,6 +15,8 @@ PxQuat Mathv::EulerToQuat(float x, float y, float z)
 
 PxVec3 Mathv::Rotate(PxVec3 v, PxReal rad, PxVec3 axis)
 {
+	// Returns a rotated vector v by a radius of rad on a given axis. For example, (1, 0, 0) rotated by PxHalfPi on the
+	// y-axis is would return (0, 0, 1);
 	PxReal c = cos(rad);
 	PxReal s = sin(rad);
 
@@ -29,6 +32,7 @@ PxVec3 Mathv::Rotate(PxVec3 v, PxReal rad, PxVec3 axis)
 
 PxVec3 Mathv::Max(PxVec3* values, int size)
 {
+	// Retrieve the maximum PxVec3 in a set of vectors.
 	PxVec3 maxV = PxVec3(0.f);
 	
 	for (int i = 0; i < size; i++)
@@ -48,6 +52,8 @@ PxVec3 Mathv::Max(PxVec3* values, int size)
 
 std::vector<PxVec3> Mathv::Plot(PxVec3 start, float startRads, float radVarience, PxVec3 scalar)
 {
+	// Plot (PxPi*2 / radVarience) number of elements around a central point, each moving in radial increments of radVarience.
+	// The initial rotation is set by startRads and the scalar can amplify the radius of the plotted points.
 	int size = (PxPi * 2.f) / radVarience;
 	std::vector<PxVec3> arr = std::vector<PxVec3>(size);
 
@@ -62,11 +68,14 @@ std::vector<PxVec3> Mathv::Plot(PxVec3 start, float startRads, float radVarience
 
 void IO::Debug(PxVec3 v)
 {
+	// Debug helper for PxVec3.
 	std::cout << v.x << "," << v.y << "," << v.z << std::endl;
 }
 
 PxVec3 Mathv::Multiply(PxQuat quat, PxVec3 vec)
 {
+	// More complex trigonometry functions for vector and quaternion multiplication. The goal is to provide a value whereby
+	// the vector has been rotated by a given quaternion.
 	float num = quat.x * 2.f;
 	float num2 = quat.y * 2.f;
 	float num3 = quat.z * 2.f;
@@ -89,5 +98,6 @@ PxVec3 Mathv::Multiply(PxQuat quat, PxVec3 vec)
 
 PxTransform Mathv::Multiply(PxTransform t, PxQuat q)
 {
+	// Simple multiplaction extensions for multiplying a PxQuat within a PxTransform by another given PxQuat.
 	return PxTransform(t.p, t.q * q);
 }

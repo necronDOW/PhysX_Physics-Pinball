@@ -16,8 +16,8 @@ namespace VisualDebugger
 	enum HUDState
 	{
 		EMPTY = 0,
-		SCORE = 1,
-		HELP = 2,
+		SCORE = 1,	// Score screen
+		HELP = 2,	// Modified help screen
 		PAUSE = 3
 	};
 
@@ -56,6 +56,8 @@ namespace VisualDebugger
 	class HUDScreen_Extended : public HUDScreen
 	{
 		private:
+			// The value field is a container for field accesses, this improves with efficiency when trying to modify a given field value
+			// by storing the char and line index of the field, and a reference the the original string.
 			struct ValueField
 			{
 				int lineNumber;
@@ -66,20 +68,25 @@ namespace VisualDebugger
 					: lineNumber(_lineNumber), charIndex(_charIndex), originalStr(_originalStr) { }
 			};
 
+			// Storage for the modifiable fields within this HUD screen.
 			std::vector<ValueField> fields;
 
 			void EditField(int lineNumber, string input)
 			{
+				// Search through each modifiable field until a matching line index is found.
 				for (int i = 0; i < fields.size(); i++)
 				{
 					if (lineNumber == fields[i].lineNumber)
 					{
+						// Extract the original string and char index from the chosen field.
 						string oStr = fields[i].originalStr;
 						int cI = fields[i].charIndex;
 
+						// Use substr to seperate the front and end from the original string, relative to the char index.
 						string front = oStr.substr(0, cI);
 						string end = oStr.substr(cI + 1, oStr.length() - cI);
 
+						// Insert the new field value between front and end, and pass the new string into the content buffer.
 						content[lineNumber] = front + input + end;
 					}
 				}
@@ -94,6 +101,9 @@ namespace VisualDebugger
 
 			int AddLine(string line) override
 			{
+				// Override for add line which extends the original functionality to extract necessary information
+				// for field generation. This identifies the '$' char from the input string and creates a field at its
+				// given index.
 				for (int i = 0; i < line.length(); i++)
 				{
 					if (line[i] == '$')
@@ -103,9 +113,11 @@ namespace VisualDebugger
 					}
 				}
 
+				// Perform base AddLine functionality and return the result.
 				return HUDScreen::AddLine(line);
 			}
 
+			// Two meta-virtual functions for accepting integer and float values in the EditField method.
 			void EditField(int lineNumber, int value) { EditField(lineNumber, to_string(value)); }
 			void EditField(int lineNumber, float value) { EditField(lineNumber, to_string(value)); }
 	};
@@ -132,6 +144,9 @@ namespace VisualDebugger
 					return;
 				}
 
+				// Check whether or not the screen selected should be a smart screen, this is only called when no
+				// screen currently exists for add line execution. Smart screens (HUDScreen_Extended) are handled differently
+				// in the update function.
 				if (smartScreen)
 					screens.push_back(new HUDScreen_Extended(screen_id));
 				else screens.push_back(new HUDScreen(screen_id));
@@ -141,6 +156,7 @@ namespace VisualDebugger
 
 			void EditLine(int screen_id, int lineNumber, int value)
 			{
+				// HUD accessor function to allow easier interactivity with the HUDScreen_Extended::EditLine implementation.
 				if (typeid(*screens[screen_id]) == typeid(HUDScreen_Extended));
 					((HUDScreen_Extended*)screens[screen_id])->EditField(lineNumber, value);
 			}
@@ -242,6 +258,9 @@ namespace VisualDebugger
 
 			int NextScreen()
 			{
+				// This function simply cycles to the next screen, catching out-of-bounds errors by looping back 
+				// around to index 0. This will also skip the PAUSE screen as this should only be displayed when
+				// the simulation is paused.
 				int next = (active_screen == screens.size()) ? 0 : active_screen + 1;
 
 				if (next == PAUSE)

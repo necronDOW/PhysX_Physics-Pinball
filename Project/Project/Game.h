@@ -6,14 +6,28 @@
 
 class Game
 {
+	/// SINGLETON
+	/// Private singleton members, this hides the constructor, destructor and copy constructor.
 	private:
-		/// SINGLETON
-		static Game* _instance;
-		Game() { }
-		Game(const Game* o) { }
-		~Game() { }
-		/// SINGLETON
+			static Game* _instance;
+			Game() { }
+			Game(const Game* o) { }
+			~Game() { }
+	/// SINGLETON
 
+	/// SINGLETON
+	/// Public accessor for getting a singleton instance, this creates an instance if none already exists and
+	/// stores it as _instance, before returning this.
+	public:
+		static Game& Instance()
+		{
+			if (_instance == nullptr)
+				_instance = new Game();
+			return *_instance;
+		}
+	/// SINGLETON
+
+	private:
 		int _multiplier = 1;
 		int _streak = 0;
 		int _score = 0;
@@ -27,15 +41,6 @@ class Game
 		void CheckState();
 
 	public:
-		/// SINGLETON
-		static Game& Instance()
-		{
-			if (_instance == nullptr)
-				_instance = new Game();
-			return *_instance;
-		}
-		/// SINGLETON
-
 		int score();
 		void score(int modifier);
 		void lives(int modifier);

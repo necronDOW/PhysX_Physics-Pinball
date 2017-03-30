@@ -4,6 +4,7 @@ MaterialLibrary* MaterialLibrary::_instance = nullptr;
 
 MaterialLibrary::~MaterialLibrary()
 {
+	// Delete all materials stored in memory.
 	for (int i = 0; i < _materials.size(); i++)
 		delete _materials[i];
 
@@ -12,6 +13,7 @@ MaterialLibrary::~MaterialLibrary()
 
 PxMaterial* MaterialLibrary::New(string id, float sf, float df, float cr)
 {
+	// Add a new material with the provided values, this is indexed within the materials array with an index of its id.
 	if (id == "")
 	{
 		std::cerr << "Material (sf=" << sf << ", df=" << df << ", cr=" << cr << ") creation failed, invalid ID!" << std::endl;
@@ -30,6 +32,7 @@ PxMaterial* MaterialLibrary::New(string id, float sf, float df, float cr)
 
 PxMaterial* MaterialLibrary::New(string id, int& outIndex, float sf, float df, float cr)
 {
+	// Retrieve a material using integer indexing instead of strings, this is faster.
 	PxMaterial* retrieved = New(id, sf, df, cr);
 
 	if (retrieved)
@@ -40,6 +43,7 @@ PxMaterial* MaterialLibrary::New(string id, int& outIndex, float sf, float df, f
 
 PxMaterial* MaterialLibrary::Get(string id)
 {
+	// Get a material if it exists within the material library.
 	for (int i = 0; i < _materials.size(); i++)
 	{
 		if (_materials[i]->id() == id)
@@ -52,6 +56,7 @@ PxMaterial* MaterialLibrary::Get(string id)
 
 PxMaterial* MaterialLibrary::Get(int index)
 {
+	// Get a material at index within the array, if the index is valid. This is faster than string comparison.
 	if (index >= 0 && index < _materials.size())
 		return _materials[index]->material();
 

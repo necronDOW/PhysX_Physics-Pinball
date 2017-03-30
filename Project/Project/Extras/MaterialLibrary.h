@@ -29,26 +29,30 @@ class MaterialLibrary
 			PxMaterial* material() { return _material; }
 	};
 
+	/// SINGLETON
+	/// Private singleton members, this hides the constructor, destructor and copy constructor.
 	private:
-		/// SINGLETON
 		static MaterialLibrary* _instance;
 		MaterialLibrary() {}
 		MaterialLibrary(const MaterialLibrary* o) { }
 		~MaterialLibrary();
-		/// SINGLETON
+	/// SINGLETON
 
-		vector<Material*> _materials;
+	vector<Material*> _materials;
 
+	/// SINGLETON
+	/// Public accessor for getting a singleton instance, this creates an instance if none already exists and
+	/// stores it as _instance, before returning this.
 	public:
-		/// SINGLETON
 		static MaterialLibrary& Instance()
 		{
 			if (_instance == nullptr)
 				_instance = new MaterialLibrary();
 			return *_instance;
 		}
-		/// SINGLETON
+	/// SINGLETON
 
+	public:
 		PxMaterial* New(string id, float sf = .0f, float df = .0f, float cr = .0f);
 		PxMaterial* New(string id, int& outIndex, float sf = .0f, float df = .0f, float cr = .0f);
 

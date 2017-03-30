@@ -23,12 +23,14 @@ class SimulationCallback : public PxSimulationEventCallback
 	public:
 		SimulationCallback() { }
 
+		// This behaviour remains constant in child classes.
 		void onTrigger(PxTriggerPair* pairs, PxU32 count);
 		void onContact(const PxContactPairHeader &pairHeader, const PxContactPair *pairs, PxU32 nbPairs);
 		void onConstraintBreak(PxConstraintInfo *constraints, PxU32 count) { }
 		void onWake(PxActor **actors, PxU32 count) { }
 		void onSleep(PxActor **actors, PxU32 count) { }
 
+		// This functionality is changed in child classes.
 		virtual void event_TriggerFound(PxShape* shape, PxShape* trigger) { }
 		virtual void event_TriggerLost(PxShape* shape, PxShape* trigger) { }
 		virtual void event_ContactFound(PxShape* const* shapes, const int size) { }
