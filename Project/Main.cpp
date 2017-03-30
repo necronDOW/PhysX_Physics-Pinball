@@ -7,7 +7,7 @@ int main()
 {
 	try 
 	{
-		VisualDebugger::Init("Tutorial 3", 800, 800); 
+		VisualDebugger::Init("Liam Wilson (13458211) - Physics Demo - 30/03/2017", 800, 800); 
 	}
 	catch (Exception exc) 
 	{ 
